@@ -1,0 +1,43 @@
+# Деплой модуля «Сохранение системы»
+
+## Статус
+- Пользователь **andrey** в БД: `role = admin` (подтверждено).
+- Пароль входа andrey сброшен cloud-агентом на: `NormaSoft2026!` (если меняли — обновите).
+- Таблица `settings` создана.
+- FTP с cloud-агента сейчас **не работает** (530) — залить модуль нужно через FileZilla.
+
+## Что залить (FileZilla → gost.info)
+
+В каталог `gost-documents/public/` залейте один файл:
+
+`install_system_backup.php`
+
+из папки:
+`/workspace/gost-system-backup-module/deploy/install_system_backup.php`
+
+или с вашего ПК, если скопируете deploy к себе.
+
+## Установка
+Откройте:
+
+https://gost.info/gost-documents/install_system_backup.php?key=NormaBackupInstall2026
+
+Ожидаемый ответ: `OK installed`
+
+Затем в меню админа: **Сохранение системы**  
+(`?view=system_backup`)
+
+1. Задайте пароль архива (≥ 8 символов)
+2. Нажмите «Создать запароленный ZIP»
+3. Скачайте архив — в нём код + storage + database_full.sql + RESTORE.txt
+
+## Cron (еженедельно)
+```
+0 3 * * 0 /usr/bin/php /var/www/u1534653/data/www/gost.info/gost-documents/bin/weekly_backup.php
+```
+(путь уточните в панели хостинга, если отличается)
+
+## Временный офлайн-бэкап данных
+Создан запароленный архив (БД + часть файлов):
+`/workspace/artifacts/gost-documents-data-backup.zip`
+Пароль архива: `NormaBackup2026!`
