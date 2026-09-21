@@ -113,6 +113,7 @@ final class SystemBackup
             $this->buildEncryptedZip($work, $zipPath, $password);
             $this->setSetting('backup_last_at', gmdate('c'));
             $this->setSetting('backup_last_file', basename($zipPath));
+            $this->registerBackup(basename($zipPath), (int) filesize($zipPath));
 
             return [
                 'file' => basename($zipPath),
@@ -129,6 +130,81 @@ final class SystemBackup
         $list = $this->listBackups();
         foreach (array_slice($list, max(0, $keep)) as $item) {
             @unlink($this->backupDir . '/' . $item['file']);
+            $this->unregisterBackup($item['file']);
+        }
+    }
+
+    /** Список для админки: файлы на диске + записи в БД. */
+    public function listBackupsForAdmin(): array
+    {
+        $this->ensureBackupsTable();
+        $byName = [];
+        foreach ($this->listBackups() as $item) {
+            $byName[$item['file']] = [
+                'file' => $item['file'],
+                'size' => $item['size'],
+                'mtime' => $item['mtime'],
+                'on_disk' => true,
+            ];
+        }
+        try {
+            $rows = $this->pdo->query(
+                'SELECT filename, file_size, UNIX_TIMESTAMP(created_at) AS mtime, note
+                 FROM system_backups ORDER BY created_at DESC'
+            )->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($rows as $row) {
+                $name = (string) $row['filename'];
+                if (!isset($byName[$name])) {
+                    $byName[$name] = [
+                        'file' => $name,
+                        'size' => (int) $row['file_size'],
+                        'mtime' => (int) $row['mtime'],
+                        'on_disk' => is_file($this->backupDir . '/' . $name),
+                        'note' => $row['note'],
+                    ];
+                } else {
+                    $byName[$name]['note'] = $row['note'];
+                }
+            }
+        } catch (Throwable $e) {
+            // table may be missing on old installs
+        }
+        $list = array_values($byName);
+        usort($list, static fn($a, $b) => ($b['mtime'] ?? 0) <=> ($a['mtime'] ?? 0));
+        return $list;
+    }
+
+    private function ensureBackupsTable(): void
+    {
+        $this->pdo->exec(
+            "CREATE TABLE IF NOT EXISTS system_backups (
+              id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+              filename VARCHAR(255) NOT NULL,
+              file_size BIGINT UNSIGNED NOT NULL DEFAULT 0,
+              created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              created_by INT UNSIGNED NULL,
+              note VARCHAR(500) NULL,
+              UNIQUE KEY uq_filename (filename)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+        );
+    }
+
+    private function registerBackup(string $filename, int $size, ?string $note = null): void
+    {
+        $this->ensureBackupsTable();
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO system_backups (filename, file_size, note) VALUES (?, ?, ?)
+             ON DUPLICATE KEY UPDATE file_size = VALUES(file_size), note = VALUES(note), created_at = CURRENT_TIMESTAMP'
+        );
+        $stmt->execute([$filename, $size, $note]);
+    }
+
+    private function unregisterBackup(string $filename): void
+    {
+        try {
+            $stmt = $this->pdo->prepare('DELETE FROM system_backups WHERE filename = ?');
+            $stmt->execute([$filename]);
+        } catch (Throwable $e) {
         }
     }
 
