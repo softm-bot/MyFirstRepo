@@ -101,3 +101,14 @@
 - Деплой кода: FileZilla на хостинг (аккаунт сайта у владельца); cloud FTP ненадёжен.
 - Модуль бэкапа: см. `gost-system-backup-module/README.md` и `artifacts/DEPLOY.txt`.
 - Две фирмы — разные юрлица; журналы и нумерация раздельные.
+
+---
+
+## Срочно (2026-09-22 ~08:10 UTC) — сайт пустой
+
+На сервере `public/index.php` (и часть PHP) имеют **размер 0 байт** после обрыва FTP STOR.
+БД цела. Восстановить `index.php` с ПК через FileZilla: см. `artifacts/RESTORE-INDEX-PHP.txt`.
+
+После восстановления: залить `artifacts/install_restamp_codes.php` и открыть с `?key=NormaRestamp2026`.
+
+Локально проверено на КП №79: метка `НД-CZF5-QH2M` справа в конце последней строки, PDF = 1 страница (`work/scripts/restamp_docx.py`).
