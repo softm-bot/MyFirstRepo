@@ -1,0 +1,13 @@
+Залейте через FileZilla (u1534553_andrey) в
+  www/gost.info/gost-documents/public/
+
+1) СНАЧАЛА восстановите index.php с вашего ПК
+   (C:\Users\andre\Desktop\кп\gost-documents\public\index.php)
+   Сейчас на сервере index.php = 0 байт — сайт пустой.
+
+2) Затем залейте install_restamp_codes.php и откройте:
+   https://gost.info/gost-documents/install_restamp_codes.php?key=NormaRestamp2026
+
+3) Удалите install_restamp_codes.php после успешного SUMMARY.
+
+Не используйте FTP из cloud-агента: data channel обрывается и обнуляет файлы.
