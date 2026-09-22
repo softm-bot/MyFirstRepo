@@ -13,3 +13,8 @@ Downloads DOCX via web session, restamps, re-uploads via edit form, updates `fil
 Requires env: `GOST_USER`, `GOST_PASSWORD`, `GOST_DB_USER`, `GOST_DB_PASS`, `GOST_DB_NAME`, optional `GOST_DB_HOST`, `GOST_BASE`.
 
 Prefer server installer: `artifacts/install_restamp_codes.php` (FileZilla).
+
+## PDF regen (`batch_pdf_regen.py`)
+Requires env: `GOST_USER`, `GOST_PASSWORD`, `GOST_DB_USER`, `GOST_DB_PASS`, `GOST_DB_NAME`.
+Optional: `GOST_DB_HOST`, `GOST_BASE`, `FORCE=1`.
+Downloads DOCX, converts with LibreOffice, fits to 1 page, uploads via `putpdf.php?k=…`.
