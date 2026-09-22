@@ -112,3 +112,10 @@
 После восстановления: залить `artifacts/install_restamp_codes.php` и открыть с `?key=NormaRestamp2026`.
 
 Локально проверено на КП №79: метка `НД-CZF5-QH2M` справа в конце последней строки, PDF = 1 страница (`work/scripts/restamp_docx.py`).
+
+## Метка НД в документах (2026-09-22)
+
+- Во всех **Word** (91 файл) код `НД-XXXX-XXXX` ставится в конец последнего абзаца с выравниванием вправо (tab).
+- `stampDocxFile()` в `index.php` обновлён; батч: `tools/restamp/install_restamp_codes.php`.
+- КП №79 (`НД-CZF5-QH2M`): Word + PDF 1 страница проверены.
+- PDF на хостинге без LibreOffice: кэш сбрасывается при restamp; PDF для №79 загружен отдельно.
