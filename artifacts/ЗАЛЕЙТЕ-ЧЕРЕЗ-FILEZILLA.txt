@@ -1,0 +1,22 @@
+ВАЖНО: аккаунт FTP u1534553_cursor НЕ попадает в живой каталог сайта gost.info
+(проверено: файл есть на FTP, по HTTPS — 404).
+
+Заливайте через FileZilla сайт «gost.info» с пользователем u1534553_andrey
+(пароль FTP — у владельца; не коммитить в git).
+
+1) Залейте файл:
+   install_system_backup.php
+   в папку: gost-documents/public/
+
+2) Откройте в браузере:
+   https://gost.info/gost-documents/install_system_backup.php?key=<INSTALL_KEY из файла>
+   (значение INSTALL_KEY — в PHP и в чате агента)
+
+3) Войдите как andrey (пароль — у владельца / в чате).
+   В меню появится «Сохранение системы»
+   Там ПЕРВЫМ блоком — «Список бэкапов» (скачать / удалить).
+
+4) Задайте пароль архива → создайте ZIP → он появится в списке.
+
+Cron:
+0 3 * * 0 /usr/bin/php /var/www/u1534653/data/www/gost.info/gost-documents/bin/weekly_backup.php

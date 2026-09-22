@@ -1,0 +1,37 @@
+# СРОЧНО: восстановить site (index.php обнулён)
+
+## Что случилось
+На хостинге файлы в `www/gost.info/gost-documents/public/` сейчас **0 байт**:
+- `index.php` (MDTM 2026-09-22 07:53) — сайт отдаёт пустой ответ
+- `install_system_backup.php`
+- `system_backup.php`
+
+Логотип и `.htaccess` целы. БД MySQL цела (126 документов, коды НД-… на месте).
+
+Скорее всего обнуление произошло из‑за обрыва FTP STORиз cloud-VM (data channel timeout): сервер создаёт пустой файл и не дописывает тело.
+
+## Что сделать в FileZilla (аккаунт сайта u1534553_andrey)
+
+1. С локального ПК откройте папку  
+   `C:\Users\andre\Desktop\кп\gost-documents\public\`
+2. Залейте **целиком** на сервер в  
+   `www/gost.info/gost-documents/public/`:
+   - `index.php` (должен быть ~50–60 КБ, не 0!)
+   - при необходимости остальные PHP из локальной копии
+3. Проверьте https://gost.info/gost-documents/ — должен открыться вход.
+
+## Метка НД в Word (после восстановления сайта)
+
+Вариант A — установщик на сервере (предпочтительно):
+1. Залейте `artifacts/install_restamp_codes.php` в `public/`
+2. Откройте в браузере:  
+   `https://gost.info/gost-documents/install_restamp_codes.php?key=NormaRestamp2026`
+3. Удалите установщик после `SUMMARY`.
+
+Вариант B — готовый КП №79:
+- Локально перепечатан: `work/restamped/127.docx`  
+  (код `НД-CZF5-QH2M` справа в конце последней строки, 1 страница)
+- После восстановления сайта замените файл документа через «Изменить» или скриптом  
+  `work/scripts/batch_restamp_upload.py`
+
+Скрипт перепечатки: `work/scripts/restamp_docx.py`
