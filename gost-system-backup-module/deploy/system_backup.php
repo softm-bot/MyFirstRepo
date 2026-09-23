@@ -292,6 +292,9 @@ $hasPass = $backup->hasArchivePassword();
 $list = method_exists($backup, 'listBackupsForAdmin')
     ? $backup->listBackupsForAdmin()
     : $backup->listBackups();
+$backupStoragePath = method_exists($backup, 'getBackupDir')
+    ? $backup->getBackupDir()
+    : '/var/www/u1534553/data/www/backup';
 $cronPath = $appRoot . '/bin/weekly_backup.php';
 $base = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
 if (str_ends_with($base, '/public')) {
@@ -367,6 +370,9 @@ pre{background:#f6f4ee;border:1px solid var(--rule);border-radius:8px;padding:12
 
 <section class="panel panel-primary">
   <h2>Список бэкапов</h2>
+  <p class="hint">Хранилище бэкапов на FTP / диске сервера:</p>
+  <pre><?= htmlspecialchars($backupStoragePath) ?></pre>
+  <p class="hint" style="margin-top:8px">FTP: каталог <code>backup</code> рядом с сайтами (путь выше). Файлы: <code>gost-documents-full-*.zip</code></p>
   <p class="count">Всего архивов: <strong><?= count($list) ?></strong></p>
   <?php if (!$list): ?>
     <div class="empty">Пока нет созданных бэкапов.<br>Задайте пароль архива ниже и нажмите «Создать запароленный ZIP».</div>
@@ -423,7 +429,7 @@ pre{background:#f6f4ee;border:1px solid var(--rule);border-radius:8px;padding:12
 
 <section class="panel">
   <h2>Создать полный бэкап</h2>
-  <p class="hint">В архив: код, storage с документами, полный SQL, RESTORE.txt. После создания архив появится в списке выше.</p>
+  <p class="hint">В архив: код, storage с документами, полный SQL, RESTORE.txt. Архив сохранится в <code><?= htmlspecialchars($backupStoragePath) ?></code> и появится в списке выше.</p>
   <form method="post">
     <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf) ?>">
     <button name="run_backup" value="1" <?= $hasPass ? '' : 'disabled title="Сначала задайте пароль"' ?>>Создать запароленный ZIP</button>

@@ -7,23 +7,57 @@ declare(strict_types=1);
 
 final class SystemBackup
 {
+    /** Каталог хранилища бэкапов на хостинге (FTP / диск). */
+    public const DEFAULT_BACKUP_DIR = '/var/www/u1534553/data/www/backup';
+
     private PDO $pdo;
     private string $appRoot;
     private string $backupDir;
     private string $encryptionKey;
 
-    public function __construct(PDO $pdo, string $appRoot, string $encryptionKey = '')
+    public function __construct(PDO $pdo, string $appRoot, string $encryptionKey = '', ?string $backupDir = null)
     {
         $this->pdo = $pdo;
         $this->appRoot = rtrim($appRoot, '/\\');
-        $this->backupDir = $this->appRoot . '/storage/backups';
+        $this->backupDir = $this->resolveBackupDir($backupDir);
         $this->encryptionKey = $encryptionKey !== ''
             ? $encryptionKey
             : hash('sha256', $this->appRoot . '|gost-documents-backup', true);
         if (!is_dir($this->backupDir)) {
-            @mkdir($this->backupDir, 0750, true);
+            if (!@mkdir($this->backupDir, 0750, true) && !is_dir($this->backupDir)) {
+                throw new RuntimeException('Не удалось создать хранилище бэкапов: ' . $this->backupDir);
+            }
         }
         $this->protectBackupDir();
+    }
+
+    public function getBackupDir(): string
+    {
+        return $this->backupDir;
+    }
+
+    private function resolveBackupDir(?string $backupDir): string
+    {
+        $candidates = [];
+        if ($backupDir !== null && $backupDir !== '') {
+            $candidates[] = rtrim($backupDir, '/\\');
+        }
+        $candidates[] = self::DEFAULT_BACKUP_DIR;
+        // Fallback только для локальной разработки / если абсолютный путь недоступен
+        $candidates[] = $this->appRoot . '/storage/backups';
+
+        foreach ($candidates as $dir) {
+            if (is_dir($dir) && is_writable($dir)) {
+                return $dir;
+            }
+            if (!is_dir($dir)) {
+                $parent = dirname($dir);
+                if (is_dir($parent) && is_writable($parent)) {
+                    return $dir;
+                }
+            }
+        }
+        return self::DEFAULT_BACKUP_DIR;
     }
 
     public function getArchivePassword(): ?string
@@ -163,7 +197,7 @@ final class SystemBackup
                 'gost-documents/MANIFEST.json',
                 'gost-documents/restore_config.php',
             ],
-            'backup_storage' => 'storage/backups/',
+            'backup_storage' => $this->backupDir,
             'restore' => 'См. RESTORE.txt — развёртывание на голом хостинге',
         ];
     }
@@ -496,7 +530,8 @@ final class SystemBackup
 
 Состав архива: весь код, storage/ (файлы документов), database_full.sql,
 MANIFEST.json, restore_config.php, RESTORE.txt.
-Бэкапы на исходном сервере лежат в storage/backups/ (в архив не входят).
+Бэкапы на исходном сервере лежат в /var/www/u1534553/data/www/backup
+(в архив не входят).
 
 1) Распакуйте ZIP с паролем администратора (andrey).
 2) Залейте содержимое папки gost-documents/ на новый хостинг
