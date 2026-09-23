@@ -259,6 +259,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = $backup->createFullBackup();
             $backup->pruneOldBackups(8);
             $ok = 'Бэкап создан: ' . $result['file'] . ' (' . number_format($result['size'] / 1048576, 2, '.', ' ') . ' МБ).';
+        } elseif (isset($_POST['prune_missing'])) {
+            $n = method_exists($backup, 'pruneMissingBackups') ? $backup->pruneMissingBackups() : 0;
+            $ok = $n > 0 ? ('Удалено записей без файла: ' . $n) : 'Ненужных записей нет.';
         } elseif (isset($_POST['download_backup'])) {
             $path = $backup->backupPath((string) ($_POST['file'] ?? ''));
             if ($path === null) {
@@ -271,17 +274,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         } elseif (isset($_POST['delete_backup'])) {
             $file = (string) ($_POST['file'] ?? '');
-            $path = $backup->backupPath($file);
-            if ($path) {
-                @unlink($path);
+            if (method_exists($backup, 'deleteBackup')) {
+                $backup->deleteBackup($file);
+            } else {
+                $path = $backup->backupPath($file);
+                if ($path) {
+                    @unlink($path);
+                }
+                try {
+                    $stmt = $pdo->prepare('DELETE FROM system_backups WHERE filename = ?');
+                    $stmt->execute([basename($file)]);
+                } catch (Throwable $e) {
+                }
             }
-            // Снять запись из реестра хранилища бэкапов
-            try {
-                $stmt = $pdo->prepare('DELETE FROM system_backups WHERE filename = ?');
-                $stmt->execute([basename($file)]);
-            } catch (Throwable $e) {
-            }
-            $ok = 'Файл удалён из хранилища бэкапов.';
+            $ok = 'Запись удалена из хранилища бэкапов.';
         }
     } catch (Throwable $e) {
         $error = $e->getMessage();
@@ -289,6 +295,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $hasPass = $backup->hasArchivePassword();
+// Автоочистка «нет файла» при открытии страницы
+if (method_exists($backup, 'pruneMissingBackups')) {
+    $backup->pruneMissingBackups();
+}
 $list = method_exists($backup, 'listBackupsForAdmin')
     ? $backup->listBackupsForAdmin()
     : $backup->listBackups();
@@ -375,7 +385,7 @@ pre{background:#f6f4ee;border:1px solid var(--rule);border-radius:8px;padding:12
   <p class="hint" style="margin-top:8px">FTP: <code>backup/gost_info_docums/</code> (путь выше). Файлы: <code>gost-documents-full-*.zip</code></p>
   <p class="count">Всего архивов: <strong><?= count($list) ?></strong></p>
   <?php if (!$list): ?>
-    <div class="empty">Пока нет созданных бэкапов.<br>Задайте пароль архива ниже и нажмите «Создать запароленный ZIP».</div>
+    <div class="empty">Пока нет созданных бэкапов.<br>Нажмите «Создать ZIP» ниже — пароль необязателен.</div>
   <?php else: ?>
   <table>
     <thead>
@@ -399,8 +409,8 @@ pre{background:#f6f4ee;border:1px solid var(--rule);border-radius:8px;padding:12
         <td class="row">
           <?php if (!isset($item['on_disk']) || !empty($item['on_disk'])): ?>
           <form method="post"><input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf) ?>"><input type="hidden" name="file" value="<?= htmlspecialchars($item['file']) ?>"><button class="btn-quiet" name="download_backup" value="1">Скачать</button></form>
-          <form method="post" onsubmit="return confirm('Удалить архив?');"><input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf) ?>"><input type="hidden" name="file" value="<?= htmlspecialchars($item['file']) ?>"><button class="btn-danger" name="delete_backup" value="1">Удалить</button></form>
           <?php endif; ?>
+          <form method="post" onsubmit="return confirm('Удалить запись/архив?');"><input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf) ?>"><input type="hidden" name="file" value="<?= htmlspecialchars($item['file']) ?>"><button class="btn-danger" name="delete_backup" value="1">Удалить</button></form>
         </td>
       </tr>
     <?php endforeach; ?>
@@ -410,29 +420,29 @@ pre{background:#f6f4ee;border:1px solid var(--rule);border-radius:8px;padding:12
 </section>
 
 <section class="panel">
-  <h2>Пароль архива</h2>
-  <p class="hint">ZIP с бэкапом всегда запаролен. Пароль задаёт только администратор.</p>
-  <p>Статус: <?php if ($hasPass): ?><span class="badge">пароль задан</span><?php else: ?><span class="badge badge-warn">пароль не задан</span><?php endif; ?></p>
+  <h2>Пароль архива (необязательно)</h2>
+  <p class="hint">Если пароль задан — новые ZIP будут запаролены. Можно создавать бэкап и без пароля.</p>
+  <p>Статус: <?php if ($hasPass): ?><span class="badge">пароль задан</span><?php else: ?><span class="badge badge-warn">без пароля</span><?php endif; ?></p>
   <form method="post" class="row">
     <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf) ?>">
-    <label style="flex:1;min-width:180px">Новый пароль<input type="password" name="archive_password" minlength="8" required autocomplete="new-password"></label>
-    <label style="flex:1;min-width:180px">Повтор<input type="password" name="archive_password2" minlength="8" required autocomplete="new-password"></label>
+    <label style="flex:1;min-width:180px">Новый пароль<input type="password" name="archive_password" minlength="8" autocomplete="new-password"></label>
+    <label style="flex:1;min-width:180px">Повтор<input type="password" name="archive_password2" minlength="8" autocomplete="new-password"></label>
     <button name="save_password" value="1">Сохранить пароль</button>
   </form>
   <?php if ($hasPass): ?>
-  <form method="post" style="margin-top:10px" onsubmit="return confirm('Очистить пароль архива?');">
+  <form method="post" style="margin-top:10px" onsubmit="return confirm('Очистить пароль архива? Дальше ZIP будут без пароля.');">
     <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf) ?>">
-    <button class="btn-quiet" name="clear_password" value="1">Очистить пароль</button>
+    <button class="btn-quiet" name="clear_password" value="1">Создавать без пароля</button>
   </form>
   <?php endif; ?>
 </section>
 
 <section class="panel">
   <h2>Создать полный бэкап</h2>
-  <p class="hint">В архив: код, storage с документами, полный SQL, RESTORE.txt. Архив сохранится в <code><?= htmlspecialchars($backupStoragePath) ?></code> и появится в списке выше.</p>
+  <p class="hint">В архив: код, storage с документами, полный SQL, RESTORE.txt. Архив сохранится в <code><?= htmlspecialchars($backupStoragePath) ?></code><?= $hasPass ? ' и будет запаролен' : ' <strong>без пароля</strong>' ?>.</p>
   <form method="post">
     <input type="hidden" name="csrf" value="<?= htmlspecialchars($csrf) ?>">
-    <button name="run_backup" value="1" <?= $hasPass ? '' : 'disabled title="Сначала задайте пароль"' ?>>Создать запароленный ZIP</button>
+    <button name="run_backup" value="1"><?= $hasPass ? 'Создать запароленный ZIP' : 'Создать ZIP (без пароля)' ?></button>
   </form>
 </section>
 
@@ -450,7 +460,7 @@ pre{background:#f6f4ee;border:1px solid var(--rule);border-radius:8px;padding:12
     <li>Создайте БД и импортируйте <code>database_full.sql</code>.</li>
     <li>Пропишите доступы в <code>config.php</code>.</li>
     <li>Права на запись в <code>storage/</code>.</li>
-    <li>Войдите как администратор и задайте новый пароль архива.</li>
+    <li>Войдите как администратор; пароль архива — по желанию.</li>
   </ol>
 </section>
 </div>

@@ -122,9 +122,11 @@ final class SystemBackup
      */
     public function createFullBackup(?string $password = null): array
     {
-        $password = $password ?? $this->getArchivePassword();
-        if ($password === null || $password === '') {
-            throw new RuntimeException('Сначала задайте пароль архива в разделе «Сохранение системы».');
+        // null = взять из настроек; пустая строка = явно без пароля
+        if ($password === null) {
+            $password = $this->getArchivePassword() ?? '';
+        } else {
+            $password = (string) $password;
         }
 
         $stamp = gmdate('Ymd\THis') . 'Z';
@@ -156,10 +158,13 @@ final class SystemBackup
             $this->buildEncryptedZip($work, $zipPath, $password);
             $this->setSetting('backup_last_at', gmdate('c'));
             $this->setSetting('backup_last_file', basename($zipPath));
+            $note = $password !== ''
+                ? 'Полный бэкап: код + БД + файлы документов (с паролем)'
+                : 'Полный бэкап: код + БД + файлы документов (без пароля)';
             $this->registerBackup(
                 basename($zipPath),
                 (int) filesize($zipPath),
-                'Полный бэкап: код + БД + файлы документов'
+                $note
             );
 
             return [
@@ -209,6 +214,35 @@ final class SystemBackup
             @unlink($this->backupDir . '/' . $item['file']);
             $this->unregisterBackup($item['file']);
         }
+    }
+
+    /** Удаляет из реестра записи, для которых ZIP уже нет на диске. */
+    public function pruneMissingBackups(): int
+    {
+        $this->ensureBackupsTable();
+        $removed = 0;
+        try {
+            $rows = $this->pdo->query('SELECT filename FROM system_backups')->fetchAll(PDO::FETCH_COLUMN);
+            foreach ($rows as $name) {
+                $name = (string) $name;
+                if (!is_file($this->backupDir . '/' . $name)) {
+                    $this->unregisterBackup($name);
+                    $removed++;
+                }
+            }
+        } catch (Throwable $e) {
+        }
+        return $removed;
+    }
+
+    public function deleteBackup(string $basename): bool
+    {
+        $path = $this->backupPath($basename);
+        if ($path !== null) {
+            @unlink($path);
+        }
+        $this->unregisterBackup(basename($basename));
+        return true;
     }
 
     /** Список для админки: файлы на диске + записи в БД. */
@@ -364,13 +398,16 @@ final class SystemBackup
     private function buildEncryptedZip(string $sourceDir, string $zipPath, string $password): void
     {
         @unlink($zipPath);
+        $usePassword = $password !== '';
 
         // Prefer zip CLI (works on most shared hostings)
         $zipBin = $this->findBinary(['zip']);
         if ($zipBin !== null) {
-            $cmd = escapeshellarg($zipBin)
-                . ' -r -P ' . escapeshellarg($password)
-                . ' ' . escapeshellarg($zipPath)
+            $cmd = escapeshellarg($zipBin) . ' -r';
+            if ($usePassword) {
+                $cmd .= ' -P ' . escapeshellarg($password);
+            }
+            $cmd .= ' ' . escapeshellarg($zipPath)
                 . ' .'
                 . ' -x "*/storage/backups/*"';
             $desc = [1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
@@ -407,11 +444,11 @@ final class SystemBackup
             $rel = substr($file->getPathname(), strlen($sourceDir) + 1);
             $rel = str_replace('\\', '/', $rel);
             $zip->addFile($file->getPathname(), $rel);
-            if (defined('ZipArchive::EM_AES_256') && method_exists($zip, 'setEncryptionName')) {
+            if ($usePassword && defined('ZipArchive::EM_AES_256') && method_exists($zip, 'setEncryptionName')) {
                 @$zip->setEncryptionName($rel, ZipArchive::EM_AES_256, $password);
             }
         }
-        if (method_exists($zip, 'setPassword')) {
+        if ($usePassword && method_exists($zip, 'setPassword')) {
             @$zip->setPassword($password);
         }
         $zip->close();
@@ -422,7 +459,7 @@ final class SystemBackup
 
         // If encryption via ZipArchive is unsupported, rewrite with zip CLI fallback already failed —
         // try Python/7z not available: leave note that password may require zip CLI.
-        if ($zipBin === null && !$this->zipLooksEncrypted($zipPath)) {
+        if ($usePassword && $zipBin === null && !$this->zipLooksEncrypted($zipPath)) {
             // Last resort: wrap with openssl AES
             $plain = $zipPath;
             $enc = $zipPath . '.aes';

@@ -48,12 +48,12 @@ require_once $appRoot . '/src/SystemBackup.php';
 
 try {
     $backup = new SystemBackup($pdo, $appRoot);
-    if (!$backup->hasArchivePassword()) {
-        fwrite(STDERR, "Archive password is not set by admin. Skip.\n");
-        exit(2);
-    }
+    // Пароль необязателен: если задан в настройках — ZIP с паролем, иначе обычный
     $result = $backup->createFullBackup();
     $backup->pruneOldBackups(8);
+    if (method_exists($backup, 'pruneMissingBackups')) {
+        $backup->pruneMissingBackups();
+    }
     fwrite(STDOUT, 'OK ' . $result['file'] . ' ' . $result['size'] . " bytes\n");
     exit(0);
 } catch (Throwable $e) {
