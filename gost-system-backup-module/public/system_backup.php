@@ -259,11 +259,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             readfile($path);
             exit;
         } elseif (isset($_POST['delete_backup'])) {
-            $path = $backup->backupPath((string) ($_POST['file'] ?? ''));
+            $file = (string) ($_POST['file'] ?? '');
+            $path = $backup->backupPath($file);
             if ($path) {
                 @unlink($path);
-                $ok = 'Файл удалён.';
             }
+            // Снять запись из реестра хранилища бэкапов
+            try {
+                $stmt = $pdo->prepare('DELETE FROM system_backups WHERE filename = ?');
+                $stmt->execute([basename($file)]);
+            } catch (Throwable $e) {
+            }
+            $ok = 'Файл удалён из хранилища бэкапов.';
         }
     } catch (Throwable $e) {
         $error = $e->getMessage();

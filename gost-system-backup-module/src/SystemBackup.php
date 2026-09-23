@@ -103,17 +103,30 @@ final class SystemBackup
         try {
             $this->copyAppTree($this->appRoot, $work . '/gost-documents');
             $sqlFile = $work . '/gost-documents/database_full.sql';
-            file_put_contents($sqlFile, $this->dumpDatabase());
+            $sql = $this->dumpDatabase();
+            file_put_contents($sqlFile, $sql);
             file_put_contents(
                 $work . '/gost-documents/RESTORE.txt',
                 $this->restoreInstructions()
+            );
+            file_put_contents(
+                $work . '/gost-documents/MANIFEST.json',
+                json_encode($this->buildManifest($sql), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
+            );
+            file_put_contents(
+                $work . '/gost-documents/restore_config.php',
+                $this->restoreConfigHelperSource()
             );
 
             $zipPath = $this->backupDir . '/gost-documents-full-' . $stamp . '.zip';
             $this->buildEncryptedZip($work, $zipPath, $password);
             $this->setSetting('backup_last_at', gmdate('c'));
             $this->setSetting('backup_last_file', basename($zipPath));
-            $this->registerBackup(basename($zipPath), (int) filesize($zipPath));
+            $this->registerBackup(
+                basename($zipPath),
+                (int) filesize($zipPath),
+                'Полный бэкап: код + БД + файлы документов'
+            );
 
             return [
                 'file' => basename($zipPath),
@@ -123,6 +136,36 @@ final class SystemBackup
         } finally {
             $this->rrmdir($work);
         }
+    }
+
+    /** @return array<string,mixed> */
+    private function buildManifest(string $sqlDump): array
+    {
+        $docCount = (int) $this->pdo->query('SELECT COUNT(*) FROM documents')->fetchColumn();
+        $fileCount = (int) $this->pdo->query('SELECT COUNT(*) FROM document_files')->fetchColumn();
+        $orgCount = (int) $this->pdo->query('SELECT COUNT(*) FROM organizations')->fetchColumn();
+        return [
+            'product' => 'gost-documents',
+            'created_at' => gmdate('c'),
+            'php_version' => PHP_VERSION,
+            'app_root' => $this->appRoot,
+            'counts' => [
+                'documents' => $docCount,
+                'document_files' => $fileCount,
+                'organizations' => $orgCount,
+            ],
+            'sql_bytes' => strlen($sqlDump),
+            'contents' => [
+                'gost-documents/ (код приложения)',
+                'gost-documents/storage/ (файлы документов)',
+                'gost-documents/database_full.sql',
+                'gost-documents/RESTORE.txt',
+                'gost-documents/MANIFEST.json',
+                'gost-documents/restore_config.php',
+            ],
+            'backup_storage' => 'storage/backups/',
+            'restore' => 'См. RESTORE.txt — развёртывание на голом хостинге',
+        ];
     }
 
     public function pruneOldBackups(int $keep = 8): void
@@ -448,21 +491,97 @@ final class SystemBackup
     private function restoreInstructions(): string
     {
         return <<<TXT
-ВОССТАНОВЛЕНИЕ gost-documents НА НОВОМ ХОСТИНГЕ
+ВОССТАНОВЛЕНИЕ gost-documents НА ГОЛОМ ХОСТИНГЕ
 ===============================================
 
-1) Распакуйте ZIP с паролем администратора.
-2) Залейте содержимое папки gost-documents/ на хостинг (корень сайта или подкаталог).
-3) Создайте MySQL-базу и пользователя.
-4) Импортируйте database_full.sql в phpMyAdmin (или mysql < database_full.sql).
-5) Пропишите доступ в config.php (или .env) — хост, имя БД, логин, пароль.
-6) Права на storage/ — запись для PHP (обычно 755/775).
-7) Удалите public/install.php если он есть.
-8) Откройте сайт, войдите как andrey (администратор).
-9) В «Сохранение системы» задайте новый пароль архива и проверьте бэкап.
-10) Добавьте cron (раз в неделю):
+Состав архива: весь код, storage/ (файлы документов), database_full.sql,
+MANIFEST.json, restore_config.php, RESTORE.txt.
+Бэкапы на исходном сервере лежат в storage/backups/ (в архив не входят).
+
+1) Распакуйте ZIP с паролем администратора (andrey).
+2) Залейте содержимое папки gost-documents/ на новый хостинг
+   (корень сайта или подкаталог, например /gost-documents/).
+3) Создайте пустую MySQL-базу и пользователя с полными правами на неё.
+4) Импортируйте database_full.sql (phpMyAdmin или:
+   mysql -u USER -p DBNAME < database_full.sql).
+5) Откройте в браузере restore_config.php — укажите хост/БД/логин/пароль.
+   Либо вручную пропишите config.php.
+6) Права на storage/ — запись для PHP (обычно 755 или 775).
+7) Удалите restore_config.php и public/install*.php после настройки.
+8) Откройте сайт, войдите как andrey (роль admin).
+9) В «Сохранение системы» задайте новый пароль архива и создайте пробный ZIP.
+10) Cron раз в неделю (путь уточните в панели хостинга):
     0 3 * * 0 /usr/bin/php /полный/путь/к/gost-documents/bin/weekly_backup.php
 
 TXT;
+    }
+
+    /** Исходник помощника config.php — кладётся в каждый полный бэкап. */
+    private function restoreConfigHelperSource(): string
+    {
+        return <<<'PHP'
+<?php
+/**
+ * Помощник после распаковки бэкапа на новом хостинге.
+ * Откройте restore_config.php в браузере, укажите данные MySQL — запишет config.php.
+ * Удалите этот файл после настройки.
+ */
+declare(strict_types=1);
+
+$done = null;
+$error = null;
+$configPath = is_dir(__DIR__ . '/public') ? __DIR__ . '/config.php' : __DIR__ . '/../config.php';
+if (!is_dir(dirname($configPath))) {
+    $configPath = __DIR__ . '/config.php';
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $host = trim((string) ($_POST['db_host'] ?? 'localhost'));
+    $name = trim((string) ($_POST['db_name'] ?? ''));
+    $user = trim((string) ($_POST['db_user'] ?? ''));
+    $pass = (string) ($_POST['db_pass'] ?? '');
+    if ($name === '' || $user === '') {
+        $error = 'Укажите имя БД и пользователя.';
+    } else {
+        try {
+            $pdo = new PDO(
+                sprintf('mysql:host=%s;dbname=%s;charset=utf8mb4', $host, $name),
+                $user,
+                $pass,
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+            );
+            $export = "<?php\nreturn [\n"
+                . "  'db_host' => " . var_export($host, true) . ",\n"
+                . "  'db_name' => " . var_export($name, true) . ",\n"
+                . "  'db_user' => " . var_export($user, true) . ",\n"
+                . "  'db_pass' => " . var_export($pass, true) . ",\n"
+                . "];\n";
+            if (file_put_contents($configPath, $export) === false) {
+                throw new RuntimeException('Не удалось записать config.php');
+            }
+            $done = 'config.php записан. Импортируйте database_full.sql и удалите restore_config.php.';
+        } catch (Throwable $e) {
+            $error = $e->getMessage();
+        }
+    }
+}
+?><!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><title>Восстановление config</title>
+<style>body{font:15px/1.45 system-ui;max-width:480px;margin:40px auto;padding:0 16px}label{display:block;margin:12px 0 4px}input{width:100%;padding:8px}button{margin-top:16px;padding:10px 16px}.err{color:#b00}.ok{color:#060}</style>
+</head><body>
+<h1>Настройка после бэкапа</h1>
+<p>1) Импортируйте <code>database_full.sql</code> в MySQL.<br>2) Укажите доступы ниже.</p>
+<?php if ($error): ?><p class="err"><?= htmlspecialchars($error) ?></p><?php endif; ?>
+<?php if ($done): ?><p class="ok"><?= htmlspecialchars($done) ?></p><?php else: ?>
+<form method="post">
+<label>Хост БД<input name="db_host" value="localhost" required></label>
+<label>Имя БД<input name="db_name" required></label>
+<label>Пользователь<input name="db_user" required></label>
+<label>Пароль<input type="password" name="db_pass"></label>
+<button type="submit">Сохранить config.php</button>
+</form>
+<?php endif; ?>
+</body></html>
+PHP;
     }
 }
