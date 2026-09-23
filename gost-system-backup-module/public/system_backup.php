@@ -294,7 +294,7 @@ $list = method_exists($backup, 'listBackupsForAdmin')
     : $backup->listBackups();
 $backupStoragePath = method_exists($backup, 'getBackupDir')
     ? $backup->getBackupDir()
-    : '/var/www/u1534553/data/www/backup';
+    : '/var/www/u1534553/data/www/backup/gost_info_docums';
 $cronPath = $appRoot . '/bin/weekly_backup.php';
 $base = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
 if (str_ends_with($base, '/public')) {
@@ -372,7 +372,7 @@ pre{background:#f6f4ee;border:1px solid var(--rule);border-radius:8px;padding:12
   <h2>Список бэкапов</h2>
   <p class="hint">Хранилище бэкапов на FTP / диске сервера:</p>
   <pre><?= htmlspecialchars($backupStoragePath) ?></pre>
-  <p class="hint" style="margin-top:8px">FTP: каталог <code>backup</code> рядом с сайтами (путь выше). Файлы: <code>gost-documents-full-*.zip</code></p>
+  <p class="hint" style="margin-top:8px">FTP: <code>backup/gost_info_docums/</code> (путь выше). Файлы: <code>gost-documents-full-*.zip</code></p>
   <p class="count">Всего архивов: <strong><?= count($list) ?></strong></p>
   <?php if (!$list): ?>
     <div class="empty">Пока нет созданных бэкапов.<br>Задайте пароль архива ниже и нажмите «Создать запароленный ZIP».</div>

@@ -1,6 +1,6 @@
 # Восстановление gost-documents на голом хостинге
 
-Каждый полный бэкап (ZIP в `/var/www/u1534553/data/www/backup/`) содержит:
+Каждый полный бэкап (ZIP в `/var/www/u1534553/data/www/backup/gost_info_docums/`) содержит:
 
 - весь код приложения
 - `storage/` — файлы документов
@@ -9,7 +9,7 @@
 - `restore_config.php` — помощник записи `config.php`
 - `RESTORE.txt` — краткая инструкция
 
-Архивы из хранилища бэкапов (`/var/www/u1534553/data/www/backup/`) в новый ZIP **не** включаются.
+Архивы из хранилища бэкапов (`/var/www/u1534553/data/www/backup/gost_info_docums/`) в новый ZIP **не** включаются.
 
 ## Шаги
 

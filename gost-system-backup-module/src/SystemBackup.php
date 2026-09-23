@@ -8,7 +8,7 @@ declare(strict_types=1);
 final class SystemBackup
 {
     /** Каталог хранилища бэкапов на хостинге (FTP / диск). */
-    public const DEFAULT_BACKUP_DIR = '/var/www/u1534553/data/www/backup';
+    public const DEFAULT_BACKUP_DIR = '/var/www/u1534553/data/www/backup/gost_info_docums';
 
     private PDO $pdo;
     private string $appRoot;
@@ -530,7 +530,7 @@ final class SystemBackup
 
 Состав архива: весь код, storage/ (файлы документов), database_full.sql,
 MANIFEST.json, restore_config.php, RESTORE.txt.
-Бэкапы на исходном сервере лежат в /var/www/u1534553/data/www/backup
+Бэкапы на исходном сервере лежат в /var/www/u1534553/data/www/backup/gost_info_docums
 (в архив не входят).
 
 1) Распакуйте ZIP с паролем администратора (andrey).
