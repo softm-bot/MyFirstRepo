@@ -9,64 +9,85 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
+// Reuse PDO / app root from parent index.php when included via ?view=system_backup
+$parentPdo = (isset($pdo) && $pdo instanceof PDO) ? $pdo : null;
+$parentAppRoot = (!empty($appRoot) && is_string($appRoot)) ? $appRoot : null;
+
 $appRootCandidates = [
+    $parentAppRoot,
     dirname(__DIR__),
     __DIR__,
     dirname(__DIR__, 2),
 ];
 $configFile = null;
-$appRoot = null;
+$appRoot = $parentAppRoot;
 foreach ($appRootCandidates as $root) {
+    if ($root === null || $root === '') {
+        continue;
+    }
     foreach ([$root . '/config.php', $root . '/public/config.php'] as $cand) {
         if (is_file($cand)) {
             $configFile = $cand;
-            $appRoot = is_file($root . '/public/index.php') || is_dir($root . '/storage')
-                ? $root
-                : dirname($cand);
+            if ($appRoot === null) {
+                $appRoot = is_file($root . '/public/index.php') || is_dir($root . '/storage')
+                    ? $root
+                    : dirname($cand);
+            }
             break 2;
         }
     }
 }
-if ($configFile === null) {
-    http_response_code(500);
-    echo 'config.php не найден';
-    exit;
-}
 
-/** @var array|PDO|null $config */
-$config = require $configFile;
-
-$pdo = null;
-if ($config instanceof PDO) {
-    $pdo = $config;
-} elseif (is_array($config)) {
-    $dsn = $config['dsn'] ?? null;
-    if ($dsn === null && isset($config['db_host'], $config['db_name'])) {
-        $dsn = sprintf(
-            'mysql:host=%s;dbname=%s;charset=utf8mb4',
-            $config['db_host'],
-            $config['db_name']
-        );
-    }
-    if ($dsn === null && isset($config['DB_HOST'], $config['DB_NAME'])) {
-        $dsn = sprintf(
-            'mysql:host=%s;dbname=%s;charset=utf8mb4',
-            $config['DB_HOST'],
-            $config['DB_NAME']
-        );
-    }
-    if ($dsn !== null) {
-        $user = $config['db_user'] ?? $config['DB_USER'] ?? $config['username'] ?? '';
-        $pass = $config['db_pass'] ?? $config['DB_PASS'] ?? $config['password'] ?? '';
-        $pdo = new PDO($dsn, $user, $pass, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
+$pdo = $parentPdo;
+if (!$pdo instanceof PDO && $configFile !== null) {
+    /** @var array|PDO|null $config */
+    $config = require $configFile;
+    if ($config instanceof PDO) {
+        $pdo = $config;
+    } elseif (is_array($config)) {
+        // Native gost-documents config: ['db' => ['dsn','user','password']]
+        if (!$pdo instanceof PDO && isset($config['db']) && is_array($config['db'])) {
+            $db = $config['db'];
+            if (!empty($db['dsn'])) {
+                $pdo = new PDO(
+                    (string) $db['dsn'],
+                    (string) ($db['user'] ?? ''),
+                    (string) ($db['password'] ?? ''),
+                    [
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    ]
+                );
+            }
+        }
+        $dsn = $config['dsn'] ?? null;
+        if (!$pdo instanceof PDO && $dsn === null && isset($config['db_host'], $config['db_name'])) {
+            $dsn = sprintf(
+                'mysql:host=%s;dbname=%s;charset=utf8mb4',
+                $config['db_host'],
+                $config['db_name']
+            );
+        }
+        if (!$pdo instanceof PDO && $dsn === null && isset($config['DB_HOST'], $config['DB_NAME'])) {
+            $dsn = sprintf(
+                'mysql:host=%s;dbname=%s;charset=utf8mb4',
+                $config['DB_HOST'],
+                $config['DB_NAME']
+            );
+        }
+        if (!$pdo instanceof PDO && $dsn !== null) {
+            $user = $config['db_user'] ?? $config['DB_USER'] ?? $config['username'] ?? '';
+            $pass = $config['db_pass'] ?? $config['DB_PASS'] ?? $config['password'] ?? '';
+            $pdo = new PDO($dsn, $user, $pass, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ]);
+        }
     }
 }
 
 // Fallback: parse .env next to config
-if (!$pdo instanceof PDO) {
+if (!$pdo instanceof PDO && $configFile !== null) {
     $envFile = dirname($configFile) . '/.env';
     if (is_file($envFile)) {
         $env = [];
@@ -90,22 +111,12 @@ if (!$pdo instanceof PDO) {
 }
 
 if (!$pdo instanceof PDO) {
-    // Last resort: hard defaults from known hosting (overridden by config when present)
-    try {
-        $pdo = new PDO(
-            'mysql:host=localhost;dbname=u1534553_docum_bd;charset=utf8mb4',
-            'u1534553_andrey',
-            '',
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
-    } catch (Throwable $e) {
-        http_response_code(500);
-        echo 'Не удалось подключиться к БД. Проверьте config.php';
-        exit;
-    }
+    http_response_code(500);
+    echo 'Не удалось подключиться к БД. Откройте раздел из меню после входа или проверьте config.php';
+    exit;
 }
 
-$appRoot = $appRoot ?: dirname($configFile);
+$appRoot = $appRoot ?: ($configFile ? dirname($configFile) : dirname(__DIR__));
 if (is_dir($appRoot . '/public') && is_dir($appRoot . '/storage')) {
     // ok
 } elseif (is_dir(dirname($appRoot) . '/storage')) {
