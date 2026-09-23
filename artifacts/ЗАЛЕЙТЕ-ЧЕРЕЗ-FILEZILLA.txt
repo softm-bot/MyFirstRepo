@@ -1,21 +1,11 @@
-ВАЖНО: аккаунт FTP u1534553_cursor НЕ попадает в живой каталог сайта gost.info
-(проверено: файл есть на FTP, по HTTPS — 404).
+Система бэкапа для andrey УСТАНОВЛЕНА на gost.info.
 
-Заливайте через FileZilla сайт «gost.info» с пользователем u1534553_andrey
-(как на вашем скрине менеджера сайтов).
-
-1) Залейте файл:
-   install_system_backup.php
-   в папку: gost-documents/public/
-
-2) Откройте в браузере:
-   https://gost.info/gost-documents/install_system_backup.php?key=NormaBackupInstall2026
-
-3) Войдите как andrey / NormaSoft2026!
-   В меню появится «Сохранение системы»
-   Там ПЕРВЫМ блоком — «Список бэкапов» (скачать / удалить).
-
-4) Задайте пароль архива → создайте ZIP → он появится в списке.
+1) Войти: andrey / NormaSoft2026!
+2) Меню → «Сохранение системы»
+3) Список архивов в хранилище storage/backups/
+4) Скачать ZIP → на голом хостинге: распаковать, импорт SQL, restore_config.php
 
 Cron:
-0 3 * * 0 /usr/bin/php /var/www/u1534653/data/www/gost.info/gost-documents/bin/weekly_backup.php
+0 3 * * 0 /usr/bin/php /var/www/u1534553/data/www/gost.info/gost-documents/bin/weekly_backup.php
+
+Пароль ZIP-архива задаётся в разделе «Сохранение системы».
