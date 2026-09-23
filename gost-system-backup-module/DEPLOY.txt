@@ -1,0 +1,22 @@
+# Деплой «Сохранение системы» — статус
+
+## Готово на https://gost.info/gost-documents/
+
+- Пользователь **andrey** = `admin`
+- Вход: andrey / NormaSoft2026!
+- Пункт меню **Сохранение системы**
+- Хранилище бэкапов: `/var/www/u1534553/data/www/backup/gost_info_docums/`
+- Проверен полный ZIP (~134 МБ): код + БД + файлы документов
+- Пароль архива задаётся в UI (сейчас задан при проверке)
+
+## Cron (панель хостинга)
+
+```
+0 3 * * 0 /usr/bin/php /var/www/u1534553/data/www/gost.info/gost-documents/bin/weekly_backup.php
+```
+
+## Повторная установка с нуля
+
+Залить `deploy/install_system_backup.php` в `gost-documents/public/` и открыть:
+
+`https://gost.info/gost-documents/public/install_system_backup.php?key=NormaBackupInstall2026`

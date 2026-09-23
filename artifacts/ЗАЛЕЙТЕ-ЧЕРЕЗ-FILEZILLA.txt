@@ -1,0 +1,11 @@
+Система бэкапа для andrey УСТАНОВЛЕНА на gost.info.
+
+1) Войти: andrey / NormaSoft2026!
+2) Меню → «Сохранение системы»
+3) Список архивов в хранилище storage/backups/
+4) Скачать ZIP → на голом хостинге: распаковать, импорт SQL, restore_config.php
+
+Cron:
+0 3 * * 0 /usr/bin/php /var/www/u1534553/data/www/gost.info/gost-documents/bin/weekly_backup.php
+
+Пароль ZIP-архива задаётся в разделе «Сохранение системы».
