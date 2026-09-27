@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gost.info/schemas/pntd/ntd-document.schema.json",
+  "title": "PNTD DocumentCard (открытый указатель pntd.ru)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "designation", "title_ru", "status"],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Идентификатор карточки в URL /nd/{id}.html"
+    },
+    "designation": {
+      "type": "string",
+      "minLength": 1,
+      "examples": ["ГОСТ 24297-87", "ГОСТ 12.1.004-91"]
+    },
+    "designation_kind": {
+      "type": "string",
+      "enum": ["GOST", "GOST_R", "SP", "TU", "OTHER"]
+    },
+    "title_ru": { "type": "string", "minLength": 1 },
+    "title_en": { "type": ["string", "null"] },
+    "status": {
+      "type": "string",
+      "enum": ["active", "replaced", "cancelled", "adopted", "unknown"]
+    },
+    "status_label_ru": {
+      "type": "string",
+      "description": "Текст статуса как на карточке (Действует, Заменен, …)"
+    },
+    "effective_from": { "type": ["string", "null"], "format": "date" },
+    "limited_until": { "type": ["string", "null"], "format": "date" },
+    "standard_kind": { "type": ["string", "null"] },
+    "requirement_kind": { "type": ["string", "null"] },
+    "developer_org": { "type": ["string", "null"] },
+    "introduced_by_cis_org": { "type": ["string", "null"] },
+    "mnd_developer": { "type": ["string", "null"] },
+    "rostekh_department": { "type": ["string", "null"] },
+    "interstate_tc": { "type": ["string", "null"] },
+    "tc_number": { "type": ["string", "null"] },
+    "tc_assignment_order_number": { "type": ["string", "null"] },
+    "tc_assignment_order_date": { "type": ["string", "null"], "format": "date" },
+    "last_edition_date": { "type": ["string", "null"], "format": "date" },
+    "amendment_notes": { "type": ["string", "null"] },
+    "page_count": { "type": ["integer", "null"], "minimum": 0 },
+    "abstract": { "type": ["string", "null"] },
+    "keywords": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "terms_note": { "type": ["string", "null"] },
+    "classifiers": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/classifierBinding" }
+    },
+    "relations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/documentRelation" }
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri"
+    }
+  },
+  "$defs": {
+    "classifierBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system", "path", "current_code"],
+      "properties": {
+        "system": {
+          "type": "string",
+          "enum": ["OKS", "KGS", "OKSTU", "GRNTI"]
+        },
+        "path": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "Путь кодов от корня к текущему узлу"
+        },
+        "current_code": { "type": "string" },
+        "labels": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Человекочитаемые названия узлов path (если известны)"
+        }
+      }
+    },
+    "documentRelation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "to_id"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "replaces",
+            "replaced_by",
+            "normative_ref_gost",
+            "normative_ref_other",
+            "cited_by"
+          ]
+        },
+        "to_id": { "type": "integer", "minimum": 1 },
+        "to_designation": { "type": ["string", "null"] },
+        "to_title_ru": { "type": ["string", "null"] },
+        "to_status_marker": {
+          "type": ["string", "null"],
+          "enum": ["Д", "З", "У", "?", null]
+        }
+      }
+    }
+  }
+}
