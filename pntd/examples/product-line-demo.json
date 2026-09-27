@@ -1,0 +1,85 @@
+{
+  "gate": {
+    "code": "PNTD-GATE",
+    "status": "closed_no_access",
+    "brand": "P — project · professional · protect",
+    "entry_path": "/forum2/pntd_gate.php",
+    "return_path": "/pntd/",
+    "forum_base": "https://progost.info/forum2/"
+  },
+  "themes": [
+    "reglament",
+    "kontur",
+    "garant",
+    "wiki",
+    "dzen",
+    "regru",
+    "gost",
+    "blueprint",
+    "vault",
+    "terminal"
+  ],
+  "active_theme": "reglament",
+  "catalog": [
+    {
+      "kind": "software",
+      "code": "PNTD-SOFT-DEMO",
+      "sku": "SOFT-001",
+      "name": "Демо-позиция ПО линейки PNTD",
+      "price": 15000
+    },
+    {
+      "kind": "base",
+      "code": "PNTD-BASE-DEMO",
+      "sku": "BASE-001",
+      "name": "Демо-база",
+      "price": null,
+      "tariffs": {
+        "price_local": 5000,
+        "price_network": 8000
+      }
+    }
+  ],
+  "kits": [
+    {
+      "id": "demo-case-1",
+      "months": 12,
+      "discount_percent": 40,
+      "lines": [
+        {
+          "code": "PNTD-SOFT-DEMO",
+          "kind": "software",
+          "tariff": null,
+          "name": "Демо-позиция ПО линейки PNTD",
+          "qty": 2,
+          "unit_price": 15000
+        },
+        {
+          "code": "PNTD-BASE-DEMO",
+          "kind": "base",
+          "tariff": "price_local",
+          "name": "Демо-база · локальный тариф",
+          "qty": 1,
+          "unit_price": 5000
+        },
+        {
+          "code": "PNTD-BASE-OPEN",
+          "kind": "base",
+          "tariff": null,
+          "name": "Позиция по запросу",
+          "qty": 1,
+          "unit_price": null
+        }
+      ]
+    }
+  ],
+  "copy_blocks": [
+    {
+      "id": "landing-demo",
+      "fields": {
+        "h2": "Линейка PNTD",
+        "lead": "Закрытый контур каталога и комплектов (прототип)."
+      }
+    }
+  ]
+}
