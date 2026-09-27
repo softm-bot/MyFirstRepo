@@ -1,0 +1,238 @@
+# Онтология / доменная модель ПНТД
+# Версия: 0.1
+# Источник: публичные поверхности pntd.ru + gost.info/pntd assets (2026-09-27)
+
+meta:
+  name: PNTD
+  title_ru: Перечень нормативно-технической документации
+  brand_expand: "project · professional · protect"
+  planes:
+    - id: open_index
+      url: https://www.pntd.ru/
+      access: public
+    - id: closed_product_line
+      url: https://gost.info/pntd/
+      access: forum_gate
+    - id: adjacent_internal_registry
+      url: https://gost.info/gost-documents/
+      access: app_users
+      note: Отдельный bounded context (не указатель НТД)
+
+enums:
+  DocumentStatus:
+    - id: active
+      label_ru: Действует
+      marker: Д
+      css: is-active
+    - id: replaced
+      label_ru: Заменен
+      marker: З
+      css: is-replaced
+    - id: cancelled
+      label_ru: Утратил силу / отменен
+      marker: У
+      css: is-cancelled
+      note: Точная формулировка UI за маркером У уточняется по полному словарю статусов
+    - id: adopted
+      label_ru: Принят
+      css: is-adopted
+    - id: unknown
+      label_ru: Неизвестен
+      marker: "?"
+      css: is-unknown
+
+  RelationType:
+    - replaces
+    - replaced_by
+    - normative_ref_gost
+    - normative_ref_other
+    - cited_by
+
+  ClassifierSystem:
+    - id: OKS
+      title_ru: Общероссийский классификатор стандартов
+      path_pattern: "/ok/{code}_oks.php"
+    - id: KGS
+      title_ru: Классификатор государственной стандартизации
+      path_pattern: "/ok/kgs/{section}.php"
+    - id: OKSTU
+      title_ru: Классификатор стандартов и ТУ
+      path_pattern: "/ok/okstu/{code}.php"
+      note: Отдельный классификатор, не ОКС
+    - id: GRNTI
+      title_ru: Государственный рубрикатор НТИ
+      path_pattern: "/grnti/{code}.php"
+
+  DesignationKind:
+    - GOST
+    - GOST_R
+    - SP
+    - TU
+    - OTHER
+
+  CatalogItemKind:
+    - software
+    - base
+
+  GateStatus:
+    - closed_no_access
+    - access_granted
+
+entities:
+  DocumentCard:
+    plane: open_index
+    identity:
+      - id: integer
+        url_template: "https://www.pntd.ru/nd/{id}.html"
+      - designation: string
+    attributes:
+      title_ru: string
+      title_en: string?
+      status: DocumentStatus
+      effective_from: date?
+      limited_until: date?
+      standard_kind: string?
+      requirement_kind: string?
+      developer_org: string?
+      introduced_by_cis_org: string?
+      mnd_developer: string?
+      rostekh_department: string?
+      interstate_tc: string?
+      tc_number: string?
+      tc_assignment_order_number: string?
+      tc_assignment_order_date: date?
+      last_edition_date: date?
+      amendment_notes: string?
+      page_count: integer?
+      abstract: string?
+      keywords: string[]?
+      terms_note: string?
+    relations:
+      classifiers: ClassifierBinding[]
+      links: DocumentRelation[]
+    ui_tabs:
+      - main
+      - scope
+      - classifiers
+      - related
+
+  ClassifierNode:
+    plane: open_index
+    identity:
+      - system: ClassifierSystem
+      - code: string
+    attributes:
+      name: string
+      parent_code: string?
+      document_count: integer?
+
+  ClassifierBinding:
+    document_id: integer
+    system: ClassifierSystem
+    path: string[]   # от корня к листу, напр. ["03","03.120","03.120.10"]
+    current_code: string
+
+  DocumentRelation:
+    from_id: integer
+    to_id: integer
+    type: RelationType
+    to_designation: string?
+    to_status_marker: string?
+
+  SearchQuery:
+    plane: open_index
+    q: string
+    results: SearchHit[]
+
+  SearchHit:
+    document_id: integer
+    designation: string
+    title: string
+    status_marker: string?
+
+  AccessGate:
+    plane: closed_product_line
+    code: "PNTD-GATE"
+    status: GateStatus
+    entry_url: "/forum2/pntd_gate.php"
+    return_path: "/pntd/"
+    forum_base: "https://progost.info/forum2/"
+
+  UiTheme:
+    plane: closed_product_line
+    id: string
+    cookie: pntd_theme
+    asset: "/pntd/assets/theme-{id}.css"
+
+  CatalogItem:
+    plane: closed_product_line
+    kind: CatalogItemKind
+    code: string          # software_code / article
+    sku: string?
+    name: string?
+    description: string?
+    price: NaturalPrice?  # пусто = по запросу
+    tariffs: map[string, NaturalPrice?]?  # для kind=base
+    ntd_ref: NtdRef?      # optional extension, не видно в public JS
+
+  NaturalPrice:
+    type: integer
+    minimum: 1
+    currency: RUB
+    constraint: "натуральное число без нуля и дробей"
+
+  KitCase:
+    plane: closed_product_line
+    id: string
+    months: integer       # типично 4..100
+    discount_percent: number  # default 40; применяется при months >= 12
+    lines: KitLine[]
+
+  KitLine:
+    code: string
+    kind: CatalogItemKind
+    tariff: string?       # для base, напр. price_local
+    name: string?
+    qty: integer          # 1..9999
+    unit_price: NaturalPrice?
+
+  CopyBlock:
+    plane: closed_product_line
+    fields: map[string, string]
+    note: "form.copy-form — редактура текстов линейки"
+
+  NtdRef:
+    designation: string?
+    card_id: integer?
+    url: string?
+
+processes:
+  open_index:
+    - find_by_designation
+    - inspect_card_status
+    - browse_classifier
+    - follow_replace_chain
+    - follow_normative_refs
+  product_line:
+    - obtain_forum_access
+    - edit_catalog_prices
+    - manage_base_tariffs
+    - configure_kit
+    - edit_copy
+    - switch_theme
+  adjacent_registry:
+    - register_outgoing_kp
+    - restamp_nd_label
+
+invariants:
+  - "DocumentCard.id стабилен в URL; смена редакции моделируется связью replaced_by"
+  - "Классификаторные привязки — пути, не единственный код"
+  - "Публичный app.js не связывает CatalogItem с DocumentCard.id"
+  - "Гость не получает HTML /pntd/; assets публичны"
+  - "Не коммитить секреты доступа к forum/FTP/БД"
+
+open_questions:
+  - "Полный словарь статусов за маркером У и полный список DesignationKind"
+  - "Серверная модель ролей за gate"
+  - "Наличие реального FK CatalogItem → DocumentCard"
+  - "Источник/ETL данных указателя pntd.ru"
