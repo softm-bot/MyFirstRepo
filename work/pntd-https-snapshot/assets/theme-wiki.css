@@ -1,0 +1,175 @@
+html[data-theme="wiki"] {
+  --bg: #f8f9fa;
+  --paper: #ffffff;
+  --ink: #202122;
+  --muted: #54595d;
+  --rule: #a2a9b1;
+  --accent: #36c;
+  --link: #0645ad;
+  --fill: #eaecf0;
+  --btn: #36c;
+  --btn-ink: #ffffff;
+}
+
+html[data-theme="wiki"] body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Segoe UI", "Liberation Sans", Arial, sans-serif;
+}
+
+html[data-theme="wiki"] .sheet { padding: 0 0 20px; }
+html[data-theme="wiki"] .sheet-frame {
+  max-width: 1080px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-top: 0;
+}
+
+html[data-theme="wiki"] .sheet::before {
+  content: "Свободная энциклопедия контура · PNTD";
+  display: block;
+  text-align: left;
+  padding: 0 18px;
+  font: 400 0.78rem/2.4 "Segoe UI", Arial, sans-serif;
+  color: var(--muted);
+  background: var(--bg);
+  border-bottom: 1px solid var(--rule);
+}
+
+html[data-theme="wiki"] .mast {
+  border-bottom: 1px solid var(--rule);
+  background: linear-gradient(#ffffff, #f8f9fa);
+}
+html[data-theme="wiki"] .mark-p {
+  border: 0;
+  color: var(--accent);
+  background: transparent;
+  padding: 0;
+}
+html[data-theme="wiki"] .mark-text strong {
+  font-family: "Linux Libertine", "Georgia", "Times New Roman", serif;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  font-size: 1.35rem;
+  font-weight: 400;
+}
+html[data-theme="wiki"] .mark-text span { color: var(--muted); }
+html[data-theme="wiki"] .mark-text .mark-theme { color: var(--link); }
+
+html[data-theme="wiki"] .mast-meta {
+  border: 1px solid var(--rule);
+  background: var(--fill);
+  padding: 6px 8px;
+}
+html[data-theme="wiki"] .meta-row b {
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: var(--ink);
+}
+
+html[data-theme="wiki"] .nav {
+  gap: 0;
+  border-bottom: 1px solid var(--rule);
+}
+html[data-theme="wiki"] .nav a {
+  border: 1px solid transparent;
+  border-bottom: 0;
+  margin-bottom: -1px;
+  color: var(--link);
+  background: transparent;
+  border-radius: 4px 4px 0 0;
+  font-size: 0.84rem;
+}
+html[data-theme="wiki"] .nav a.is-active {
+  background: #fff;
+  border-color: var(--rule);
+  color: var(--ink);
+  font-weight: 600;
+}
+html[data-theme="wiki"] .nav-code { color: var(--muted); }
+
+html[data-theme="wiki"] .theme-switch-btn {
+  border: 1px solid var(--rule);
+  background: #f8f9fa;
+  color: var(--ink);
+  margin: 0 2px 2px 0;
+  border-radius: 2px;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+html[data-theme="wiki"] .theme-switch-btn.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+html[data-theme="wiki"] .doc-kicker { color: var(--muted); }
+html[data-theme="wiki"] .doc-head h1,
+html[data-theme="wiki"] .gate h1 {
+  font-family: "Linux Libertine", "Georgia", "Times New Roman", serif;
+  font-weight: 400;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 8px;
+  color: var(--ink);
+}
+html[data-theme="wiki"] h2,
+html[data-theme="wiki"] h3 {
+  font-family: "Linux Libertine", "Georgia", "Times New Roman", serif;
+  font-weight: 400;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 4px;
+  color: var(--ink);
+}
+html[data-theme="wiki"] h3 { border-bottom: 0; }
+
+html[data-theme="wiki"] .prose a,
+html[data-theme="wiki"] a { color: var(--link); }
+html[data-theme="wiki"] .prose a:visited { color: #0b0080; }
+
+html[data-theme="wiki"] .card {
+  border: 1px solid var(--rule);
+  background: #f8f9fa;
+}
+html[data-theme="wiki"] .card h3 {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+html[data-theme="wiki"] table.data { border: 1px solid var(--rule); }
+html[data-theme="wiki"] table.data th,
+html[data-theme="wiki"] table.data td { border: 1px solid var(--rule); }
+html[data-theme="wiki"] table.data th {
+  background: #eaecf0;
+  color: var(--ink);
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+html[data-theme="wiki"] table.data tr.group-row th {
+  background: #eaf3ff;
+  color: var(--link);
+  border-bottom: 2px solid var(--accent);
+}
+
+html[data-theme="wiki"] .btn {
+  background: #36c;
+  color: #fff;
+  border: 1px solid #36c;
+  border-radius: 2px;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+html[data-theme="wiki"] .btn-ghost {
+  background: #f8f9fa;
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+}
+
+html[data-theme="wiki"] .note {
+  border: 1px solid #a2d5f5;
+  background: #eaf3ff;
+  border-left: 4px solid #36c;
+}
+html[data-theme="wiki"] .colophon {
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  background: var(--bg);
+}
+html[data-theme="wiki"] .muted { color: var(--muted); opacity: 1; }

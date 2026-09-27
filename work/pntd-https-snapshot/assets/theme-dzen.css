@@ -1,0 +1,192 @@
+html[data-theme="dzen"] {
+  --bg: #f2f2f2;
+  --paper: #ffffff;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --rule: #e4e4e4;
+  --accent: #fc0;
+  --link: #06c;
+  --fill: #fafafa;
+  --btn: #1a1a1a;
+  --btn-ink: #ffffff;
+  --radius: 16px;
+}
+
+html[data-theme="dzen"] body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "YS Text", "Segoe UI", Arial, sans-serif;
+}
+
+html[data-theme="dzen"] .sheet { padding: 12px 0 28px; }
+html[data-theme="dzen"] .sheet-layout { padding: 0 10px; }
+html[data-theme="dzen"] .sheet-frame {
+  max-width: none;
+  background: transparent;
+  border: 0;
+}
+html[data-theme="dzen"] .theme-rail {
+  padding-top: 8px;
+}
+html[data-theme="dzen"] .theme-switch {
+  background: var(--paper);
+  border-radius: var(--radius);
+  padding: 10px;
+}
+html[data-theme="dzen"] .theme-switch-btn {
+  border: 0;
+  background: var(--fill);
+  color: var(--ink);
+  border-radius: 10px;
+  margin: 0 0 4px;
+  font-family: Arial, sans-serif;
+}
+html[data-theme="dzen"] .theme-switch-btn.is-active {
+  background: var(--accent);
+  color: #111;
+  font-weight: 700;
+}
+
+html[data-theme="dzen"] .sheet::before {
+  content: "Лента контура · новости продукта · PNTD";
+  display: block;
+  text-align: center;
+  margin: 0 auto 10px;
+  max-width: 1100px;
+  font: 600 0.72rem/2 Arial, sans-serif;
+  letter-spacing: 0.08em;
+  color: #333;
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+html[data-theme="dzen"] .mast,
+html[data-theme="dzen"] .toolbar,
+html[data-theme="dzen"] .main,
+html[data-theme="dzen"] .colophon {
+  background: var(--paper);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+}
+html[data-theme="dzen"] .mast {
+  border: 0;
+  padding: 18px 20px 14px;
+}
+html[data-theme="dzen"] .toolbar {
+  padding: 12px 16px;
+  align-items: center;
+}
+html[data-theme="dzen"] .main { padding: 16px 20px 24px; }
+html[data-theme="dzen"] .colophon {
+  padding: 14px 20px;
+  margin-bottom: 0;
+  color: var(--muted);
+  border: 0;
+}
+
+html[data-theme="dzen"] .mark-p {
+  border: 0;
+  color: #111;
+  background: var(--accent);
+  border-radius: 12px;
+  padding: 6px;
+}
+html[data-theme="dzen"] .mark-text strong {
+  font-family: Arial, sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-size: 1.35rem;
+}
+html[data-theme="dzen"] .mark-text span { color: var(--muted); }
+html[data-theme="dzen"] .mark-text .mark-theme { color: #111; }
+
+html[data-theme="dzen"] .mast-meta {
+  background: var(--fill);
+  border-radius: 12px;
+  padding: 8px 10px;
+  border: 0;
+}
+html[data-theme="dzen"] .meta-row b {
+  font-family: Arial, sans-serif;
+  color: var(--ink);
+}
+
+html[data-theme="dzen"] .nav { gap: 6px; }
+html[data-theme="dzen"] .nav a {
+  border-radius: 999px;
+  background: var(--fill);
+  color: var(--ink);
+  padding: 8px 12px;
+  font-size: 0.8rem;
+}
+html[data-theme="dzen"] .nav a.is-active {
+  background: var(--ink);
+  color: #fff;
+}
+html[data-theme="dzen"] .nav a.is-active .nav-code { color: #fc0; opacity: 1; }
+html[data-theme="dzen"] .nav-code { color: var(--muted); }
+
+html[data-theme="dzen"] .doc-kicker { color: var(--muted); text-transform: none; letter-spacing: 0; }
+html[data-theme="dzen"] .doc-head h1,
+html[data-theme="dzen"] .gate h1,
+html[data-theme="dzen"] h2,
+html[data-theme="dzen"] h3 {
+  font-family: Arial, sans-serif;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  border: 0;
+}
+html[data-theme="dzen"] .lead { color: var(--muted); }
+
+html[data-theme="dzen"] .card {
+  border: 0;
+  border-radius: 16px;
+  background: var(--fill);
+  padding: 14px 16px;
+}
+html[data-theme="dzen"] .card h3 { border: 0; color: var(--ink); }
+html[data-theme="dzen"] .card .sku { color: #b88600; }
+
+html[data-theme="dzen"] table.data {
+  border: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--fill);
+}
+html[data-theme="dzen"] table.data th,
+html[data-theme="dzen"] table.data td { border-bottom: 1px solid #ececec; }
+html[data-theme="dzen"] table.data th {
+  background: #fff;
+  color: var(--ink);
+  font-family: Arial, sans-serif;
+}
+html[data-theme="dzen"] table.data tr.group-row th {
+  background: #fff8cc;
+  color: #111;
+  border-bottom: 2px solid var(--accent);
+}
+
+html[data-theme="dzen"] .btn {
+  background: var(--btn);
+  color: var(--btn-ink);
+  border: 0;
+  border-radius: 12px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+}
+html[data-theme="dzen"] .btn-ghost {
+  background: var(--accent);
+  color: #111;
+  border: 0;
+  border-radius: 12px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+}
+
+html[data-theme="dzen"] .note {
+  border: 0;
+  background: #fff8cc;
+  border-radius: 12px;
+}
+html[data-theme="dzen"] .prose a { color: var(--link); }
+html[data-theme="dzen"] .muted { color: var(--muted); opacity: 1; }

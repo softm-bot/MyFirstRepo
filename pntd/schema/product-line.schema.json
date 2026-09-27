@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gost.info/schemas/pntd/product-line.schema.json",
+  "title": "PNTD closed product line (gost.info/pntd prototype)",
+  "description": "Модель выведена из публичного /pntd/assets/app.js и страницы gate. Авторизованный HTML не исследовался.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["gate", "themes", "catalog", "kits"],
+  "properties": {
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "status"],
+      "properties": {
+        "code": { "const": "PNTD-GATE" },
+        "status": {
+          "type": "string",
+          "enum": ["closed_no_access", "access_granted"]
+        },
+        "brand": {
+          "type": "string",
+          "default": "P — project · professional · protect"
+        },
+        "entry_path": {
+          "type": "string",
+          "default": "/forum2/pntd_gate.php"
+        },
+        "return_path": {
+          "type": "string",
+          "default": "/pntd/"
+        },
+        "forum_base": {
+          "type": "string",
+          "format": "uri",
+          "default": "https://progost.info/forum2/"
+        }
+      }
+    },
+    "themes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true,
+      "description": "id тем UI (data-themes / theme-*.css)"
+    },
+    "active_theme": { "type": ["string", "null"] },
+    "catalog": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/catalogItem" }
+    },
+    "kits": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/kitCase" }
+    },
+    "copy_blocks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/copyBlock" }
+    }
+  },
+  "$defs": {
+    "naturalPrice": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Натуральное число рублей; пустое значение моделируется отсутствием поля / null на уровне родителя"
+    },
+    "ntdRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Опциональный мост к указателю pntd.ru (в public JS не обнаружен)",
+      "properties": {
+        "designation": { "type": "string" },
+        "card_id": { "type": "integer", "minimum": 1 },
+        "url": { "type": "string", "format": "uri" }
+      }
+    },
+    "catalogItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "code"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["software", "base"] },
+        "code": { "type": "string", "minLength": 1 },
+        "sku": { "type": ["string", "null"] },
+        "name": { "type": ["string", "null"] },
+        "description": { "type": ["string", "null"] },
+        "price": { "anyOf": [{ "$ref": "#/$defs/naturalPrice" }, { "type": "null" }] },
+        "tariffs": {
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [{ "$ref": "#/$defs/naturalPrice" }, { "type": "null" }]
+          },
+          "description": "Для kind=base; ключ по умолчанию в UI — price_local"
+        },
+        "ntd_ref": { "$ref": "#/$defs/ntdRef" }
+      }
+    },
+    "kitLine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "kind", "qty"],
+      "properties": {
+        "code": { "type": "string" },
+        "kind": { "type": "string", "enum": ["software", "base"] },
+        "tariff": { "type": ["string", "null"] },
+        "name": { "type": ["string", "null"] },
+        "qty": { "type": "integer", "minimum": 1, "maximum": 9999 },
+        "unit_price": {
+          "anyOf": [{ "$ref": "#/$defs/naturalPrice" }, { "type": "null" }],
+          "description": "null → «по запросу», не входит в сумму"
+        }
+      }
+    },
+    "kitCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "months", "lines"],
+      "properties": {
+        "id": { "type": "string" },
+        "months": { "type": "integer", "minimum": 4, "maximum": 100 },
+        "discount_percent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 40,
+          "description": "Скидка применяется при months >= 12"
+        },
+        "lines": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/kitLine" }
+        }
+      }
+    },
+    "copyBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fields"],
+      "properties": {
+        "id": { "type": "string" },
+        "fields": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    }
+  }
+}

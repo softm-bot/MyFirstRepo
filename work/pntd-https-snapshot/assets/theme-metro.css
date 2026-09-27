@@ -1,0 +1,109 @@
+html[data-theme="metro"] {
+  --bg: #f5f5f5;
+  --paper: #ffffff;
+  --ink: #1a1a1a;
+  --muted: #666666;
+  --rule: #d9d9d9;
+  --accent: #e42313;
+  --fill: #f2f2f2;
+  --btn: #e42313;
+  --btn-ink: #ffffff;
+  --radius: 20px;
+}
+
+html[data-theme="metro"] body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Arial, sans-serif;
+}
+html[data-theme="metro"] .sheet { padding: 12px 0 24px; }
+html[data-theme="metro"] .sheet-layout { padding: 0 10px; }
+html[data-theme="metro"] .sheet-frame {
+  max-width: none;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 20px;
+}
+html[data-theme="metro"] .sheet::before {
+  content: "METRO · схема · маршруты доступа · PNTD";
+  display: block;
+  max-width: calc(var(--max) + 11rem);
+  margin: 0 auto 10px;
+  padding: 8px 14px;
+  font: 700 0.72rem/1.3 Arial, sans-serif;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  background: var(--ink);
+  border-radius: 20px;
+}
+html[data-theme="metro"] .mark-p {
+  border: 0; color: #fff; background: var(--accent); border-radius: 10px; padding: 6px;
+}
+html[data-theme="metro"] .mark-text strong {
+  font-family: Arial, sans-serif; letter-spacing: 0.06em; color: var(--ink); font-size: 1.2rem;
+}
+html[data-theme="metro"] .mark-text span { color: var(--muted); }
+html[data-theme="metro"] .mark-text .mark-theme { color: var(--accent); }
+html[data-theme="metro"] .mast { border-bottom: 1px solid var(--rule); }
+html[data-theme="metro"] .mast-meta {
+  border: 1px solid var(--rule); border-radius: 10px; background: var(--fill); padding: 8px 10px;
+}
+html[data-theme="metro"] .meta-row b { font-family: Arial, sans-serif; color: var(--accent); }
+html[data-theme="metro"] .nav { gap: 6px; }
+html[data-theme="metro"] .nav a {
+  border: 1px solid var(--rule); border-radius: 8px; background: var(--fill); color: var(--ink); font-size: 0.8rem;
+}
+html[data-theme="metro"] .nav a.is-active {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+}
+html[data-theme="metro"] .nav a.is-active .nav-code { color: #fff; opacity: .9; }
+html[data-theme="metro"] .theme-rail { padding-top: 8px; }
+html[data-theme="metro"] .theme-switch {
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 20px; padding: 10px;
+}
+html[data-theme="metro"] .theme-switch-label { color: var(--muted); }
+html[data-theme="metro"] .theme-switch-btn {
+  border: 1px solid var(--rule); background: var(--fill); color: var(--ink);
+  border-radius: 8px; margin: 0 0 4px; font-family: Arial, sans-serif;
+}
+html[data-theme="metro"] .theme-switch-btn.is-active {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+}
+html[data-theme="metro"] .doc-kicker { color: var(--accent); }
+html[data-theme="metro"] .doc-head h1,
+html[data-theme="metro"] .gate h1,
+html[data-theme="metro"] h2,
+html[data-theme="metro"] h3 {
+  font-family: Arial, sans-serif; color: var(--ink); border: 0;
+}
+html[data-theme="metro"] .lead,
+html[data-theme="metro"] .muted { color: var(--muted); opacity: 1; }
+html[data-theme="metro"] .card {
+  border: 1px solid var(--rule); border-radius: 20px; background: var(--fill);
+}
+html[data-theme="metro"] .card h3 { color: var(--ink); border: 0; }
+html[data-theme="metro"] .card .sku { color: var(--accent); }
+html[data-theme="metro"] table.data {
+  border: 1px solid var(--rule); border-radius: 20px; overflow: hidden; background: var(--paper);
+}
+html[data-theme="metro"] table.data th,
+html[data-theme="metro"] table.data td { border-bottom: 1px solid var(--rule); }
+html[data-theme="metro"] table.data th { background: var(--fill); color: var(--ink); font-family: Arial, sans-serif; }
+html[data-theme="metro"] table.data tr.group-row th {
+  background: var(--fill); color: var(--accent); border-bottom: 2px solid var(--accent);
+}
+html[data-theme="metro"] .btn {
+  background: var(--btn); color: var(--btn-ink); border: 1px solid var(--btn);
+  border-radius: 8px; font-family: Arial, sans-serif; font-weight: 700;
+}
+html[data-theme="metro"] .btn-ghost {
+  background: transparent; color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 8px; font-family: Arial, sans-serif; font-weight: 700;
+}
+html[data-theme="metro"] .note {
+  border-left: 4px solid var(--accent); background: var(--fill); border-radius: 0 8px 8px 0;
+}
+html[data-theme="metro"] .colophon {
+  border-top: 1px solid var(--rule); color: var(--muted); background: var(--fill);
+}
+html[data-theme="metro"] .prose a { color: var(--accent); }

@@ -1,0 +1,195 @@
+html[data-theme="regru"] {
+  --bg: #f0f4f2;
+  --paper: #ffffff;
+  --ink: #1f2a24;
+  --muted: #66756c;
+  --rule: #d7e3db;
+  --accent: #00a651;
+  --link: #008a44;
+  --fill: #f5faf7;
+  --btn: #00a651;
+  --btn-ink: #ffffff;
+  --radius: 12px;
+  --navy: #0f2c22;
+}
+
+html[data-theme="regru"] body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+}
+
+html[data-theme="regru"] .sheet { padding: 14px 0 28px; }
+html[data-theme="regru"] .sheet-layout { padding: 0 10px; }
+html[data-theme="regru"] .sheet-frame {
+  max-width: none;
+  background: transparent;
+  border: 0;
+}
+html[data-theme="regru"] .theme-rail { padding-top: 8px; }
+html[data-theme="regru"] .theme-switch {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 10px;
+}
+html[data-theme="regru"] .theme-switch-btn {
+  border: 1px solid var(--rule);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 8px;
+  margin: 0 0 4px;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+html[data-theme="regru"] .theme-switch-btn.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+html[data-theme="regru"] .sheet::before {
+  content: "Личный кабинет контура · домены · услуги · PNTD";
+  display: block;
+  max-width: 1100px;
+  margin: 0 auto 12px;
+  padding: 10px 16px;
+  font: 600 0.78rem/1.4 "Segoe UI", Arial, sans-serif;
+  color: #fff;
+  background: var(--navy);
+  border-radius: var(--radius);
+  letter-spacing: 0.04em;
+}
+
+html[data-theme="regru"] .mast,
+html[data-theme="regru"] .toolbar,
+html[data-theme="regru"] .main,
+html[data-theme="regru"] .colophon {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+}
+html[data-theme="regru"] .mast {
+  border-bottom: 1px solid var(--rule);
+  padding: 16px 18px 12px;
+}
+html[data-theme="regru"] .toolbar {
+  padding: 12px 16px;
+  border-top: 0;
+  margin-top: -12px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+html[data-theme="regru"] .main { padding: 16px 18px 24px; }
+html[data-theme="regru"] .colophon {
+  margin-bottom: 0;
+  color: var(--muted);
+  background: var(--fill);
+}
+
+html[data-theme="regru"] .mark-p {
+  border: 0;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 10px;
+  padding: 6px;
+}
+html[data-theme="regru"] .mark-text strong {
+  font-family: "Segoe UI", Arial, sans-serif;
+  letter-spacing: 0.08em;
+  color: var(--navy);
+  font-size: 1.2rem;
+}
+html[data-theme="regru"] .mark-text span { color: var(--muted); }
+html[data-theme="regru"] .mark-text .mark-theme { color: var(--accent); }
+
+html[data-theme="regru"] .mast-meta {
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--fill);
+  padding: 8px 10px;
+}
+html[data-theme="regru"] .meta-row b {
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: var(--accent);
+}
+
+html[data-theme="regru"] .nav { gap: 6px; }
+html[data-theme="regru"] .nav a {
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 0.8rem;
+}
+html[data-theme="regru"] .nav a.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+html[data-theme="regru"] .nav a.is-active .nav-code { color: #e8ffe8; opacity: 1; }
+html[data-theme="regru"] .nav-code { color: var(--muted); }
+
+html[data-theme="regru"] .doc-kicker { color: var(--accent); }
+html[data-theme="regru"] .doc-head h1,
+html[data-theme="regru"] .gate h1,
+html[data-theme="regru"] h2,
+html[data-theme="regru"] h3 {
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: var(--navy);
+  border: 0;
+}
+html[data-theme="regru"] .lead { color: var(--muted); }
+
+html[data-theme="regru"] .card {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: #fff;
+}
+html[data-theme="regru"] .card h3 { color: var(--navy); border: 0; }
+html[data-theme="regru"] .card .sku { color: var(--accent); }
+
+html[data-theme="regru"] table.data {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #fff;
+}
+html[data-theme="regru"] table.data th,
+html[data-theme="regru"] table.data td { border-bottom: 1px solid var(--rule); }
+html[data-theme="regru"] table.data th {
+  background: var(--fill);
+  color: var(--navy);
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+html[data-theme="regru"] table.data tr.group-row th {
+  background: #e7f7ee;
+  color: var(--navy);
+  border-bottom: 2px solid var(--accent);
+}
+
+html[data-theme="regru"] .btn {
+  background: var(--btn);
+  color: var(--btn-ink);
+  border: 1px solid var(--btn);
+  border-radius: 8px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-weight: 700;
+}
+html[data-theme="regru"] .btn-ghost {
+  background: #fff;
+  color: var(--link);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-weight: 700;
+}
+
+html[data-theme="regru"] .note {
+  border: 1px solid #b7e4c7;
+  background: #e7f7ee;
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+}
+html[data-theme="regru"] .prose a { color: var(--link); }
+html[data-theme="regru"] .muted { color: var(--muted); opacity: 1; }

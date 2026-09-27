@@ -1,0 +1,196 @@
+html[data-theme="garant"] {
+  --bg: #f3f5f8;
+  --paper: #ffffff;
+  --ink: #1a2a44;
+  --muted: #5a6b82;
+  --rule: #d8dee8;
+  --accent: #e30613;
+  --navy: #1d478f;
+  --fill: #f7f9fc;
+  --btn: #e30613;
+  --btn-ink: #ffffff;
+  --radius: 10px;
+}
+
+html[data-theme="garant"] body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+html[data-theme="garant"] .sheet { padding: 0 0 24px; }
+html[data-theme="garant"] .sheet-frame {
+  max-width: 1120px;
+  background: var(--paper);
+  border: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+html[data-theme="garant"] .sheet::before {
+  content: "ИНФОРМАЦИОННО-НОРМАТИВНОЕ ОБЕСПЕЧЕНИЕ · PNTD";
+  display: block;
+  text-align: center;
+  font: 700 0.68rem/2.2 Arial, sans-serif;
+  letter-spacing: 0.12em;
+  color: #fff;
+  background: var(--navy);
+}
+
+html[data-theme="garant"] .mast {
+  border-bottom: 1px solid var(--rule);
+  padding-top: 18px;
+  padding-bottom: 14px;
+}
+html[data-theme="garant"] .mark-p {
+  border: 0;
+  color: var(--accent);
+  background: transparent;
+  padding: 0;
+  border-radius: 8px;
+}
+html[data-theme="garant"] .mark-text strong {
+  font-family: Arial, sans-serif;
+  letter-spacing: 0.18em;
+  color: var(--navy);
+  font-size: 1.25rem;
+}
+html[data-theme="garant"] .mark-text span { color: var(--muted); }
+html[data-theme="garant"] .mark-text .mark-theme { color: var(--accent); }
+
+html[data-theme="garant"] .mast-meta {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  background: var(--fill);
+}
+html[data-theme="garant"] .meta-row span { color: var(--muted); }
+html[data-theme="garant"] .meta-row b {
+  color: var(--navy);
+  font-family: Arial, sans-serif;
+  font-size: 0.78rem;
+}
+
+html[data-theme="garant"] .nav {
+  gap: 0;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  overflow: hidden;
+  background: #fff;
+}
+html[data-theme="garant"] .nav a {
+  border-right: 1px solid var(--rule);
+  color: var(--navy);
+  font-family: Arial, sans-serif;
+  font-size: 0.8rem;
+  padding: 8px 12px;
+}
+html[data-theme="garant"] .nav a:last-child { border-right: 0; }
+html[data-theme="garant"] .nav a.is-active {
+  background: var(--accent);
+  color: #fff;
+}
+html[data-theme="garant"] .nav a.is-active .nav-code { color: #fff; opacity: 0.85; }
+html[data-theme="garant"] .nav-code { color: #8a97ab; }
+
+html[data-theme="garant"] .theme-switch-label { color: var(--muted); }
+html[data-theme="garant"] .theme-switch-btn {
+  border: 1px solid var(--rule);
+  margin: 0 0 -1px;
+  background: #fff;
+  color: var(--navy);
+  font-family: Arial, sans-serif;
+  border-radius: 0;
+}
+html[data-theme="garant"] .theme-switch-btn:first-of-type { border-radius: 8px 8px 0 0; }
+html[data-theme="garant"] .theme-switch-btn:last-of-type { border-radius: 0 0 8px 8px; }
+html[data-theme="garant"] .theme-switch-btn.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+html[data-theme="garant"] .doc-kicker { color: var(--accent); }
+html[data-theme="garant"] .doc-head h1,
+html[data-theme="garant"] .gate h1,
+html[data-theme="garant"] h2,
+html[data-theme="garant"] h3 {
+  font-family: Arial, sans-serif;
+  color: var(--navy);
+  letter-spacing: 0.01em;
+}
+html[data-theme="garant"] .doc-head h1,
+html[data-theme="garant"] .gate h1 {
+  text-transform: uppercase;
+  font-size: 1.55rem;
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+html[data-theme="garant"] .lead { color: var(--muted); max-width: 40rem; }
+
+html[data-theme="garant"] .card {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: #fff;
+}
+html[data-theme="garant"] .card h3 {
+  color: var(--navy);
+  border: 0;
+  padding-bottom: 0;
+}
+html[data-theme="garant"] .card .sku { color: var(--accent); }
+
+html[data-theme="garant"] table.data {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #fff;
+}
+html[data-theme="garant"] table.data th,
+html[data-theme="garant"] table.data td { border-bottom: 1px solid var(--rule); }
+html[data-theme="garant"] table.data th {
+  background: var(--fill);
+  color: var(--navy);
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+}
+html[data-theme="garant"] table.data tr.group-row th {
+  background: #eef2f8;
+  color: var(--navy);
+  border-bottom: 2px solid var(--accent);
+}
+
+html[data-theme="garant"] .btn {
+  background: var(--btn);
+  color: var(--btn-ink);
+  border: 1px solid var(--btn);
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+html[data-theme="garant"] .btn-ghost {
+  background: #fff;
+  color: var(--navy);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+html[data-theme="garant"] .note {
+  border-left: 4px solid var(--accent);
+  background: var(--fill);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+html[data-theme="garant"] .colophon {
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  background: var(--fill);
+}
+html[data-theme="garant"] .muted { color: var(--muted); opacity: 1; }
+
+html[data-theme="garant"] a { color: var(--navy); }
+html[data-theme="garant"] .prose a { color: var(--accent); text-decoration: underline; }

@@ -1,0 +1,109 @@
+html[data-theme="blueprint"] {
+  --bg: #0a2744;
+  --paper: #0d3154;
+  --ink: #d7e9ff;
+  --muted: #7ea3c7;
+  --rule: #1e4f7a;
+  --accent: #5ec8ff;
+  --fill: #113a5f;
+  --btn: #5ec8ff;
+  --btn-ink: #062038;
+  --radius: 0;
+}
+
+html[data-theme="blueprint"] body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Consolas", "Courier New", monospace;
+}
+html[data-theme="blueprint"] .sheet { padding: 12px 0 24px; }
+html[data-theme="blueprint"] .sheet-layout { padding: 0 10px; }
+html[data-theme="blueprint"] .sheet-frame {
+  max-width: none;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 0;
+}
+html[data-theme="blueprint"] .sheet::before {
+  content: "ЧЕРТЁЖ · blueprint · инженерный контур · PNTD";
+  display: block;
+  max-width: calc(var(--max) + 11rem);
+  margin: 0 auto 10px;
+  padding: 8px 14px;
+  font: 700 0.72rem/1.3 "Consolas", "Courier New", monospace;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: var(--fill);
+  border-radius: 0;
+}
+html[data-theme="blueprint"] .mark-p {
+  border: 0; color: #fff; background: var(--accent); border-radius: 10px; padding: 6px;
+}
+html[data-theme="blueprint"] .mark-text strong {
+  font-family: "Consolas", "Courier New", monospace; letter-spacing: 0.06em; color: var(--ink); font-size: 1.2rem;
+}
+html[data-theme="blueprint"] .mark-text span { color: var(--muted); }
+html[data-theme="blueprint"] .mark-text .mark-theme { color: var(--accent); }
+html[data-theme="blueprint"] .mast { border-bottom: 1px solid var(--rule); }
+html[data-theme="blueprint"] .mast-meta {
+  border: 1px solid var(--rule); border-radius: 10px; background: var(--fill); padding: 8px 10px;
+}
+html[data-theme="blueprint"] .meta-row b { font-family: "Consolas", "Courier New", monospace; color: var(--accent); }
+html[data-theme="blueprint"] .nav { gap: 6px; }
+html[data-theme="blueprint"] .nav a {
+  border: 1px solid var(--rule); border-radius: 8px; background: var(--fill); color: var(--ink); font-size: 0.8rem;
+}
+html[data-theme="blueprint"] .nav a.is-active {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+}
+html[data-theme="blueprint"] .nav a.is-active .nav-code { color: #fff; opacity: .9; }
+html[data-theme="blueprint"] .theme-rail { padding-top: 8px; }
+html[data-theme="blueprint"] .theme-switch {
+  background: var(--paper); border: 1px solid var(--rule); border-radius: 0; padding: 10px;
+}
+html[data-theme="blueprint"] .theme-switch-label { color: var(--muted); }
+html[data-theme="blueprint"] .theme-switch-btn {
+  border: 1px solid var(--rule); background: var(--fill); color: var(--ink);
+  border-radius: 8px; margin: 0 0 4px; font-family: "Consolas", "Courier New", monospace;
+}
+html[data-theme="blueprint"] .theme-switch-btn.is-active {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+}
+html[data-theme="blueprint"] .doc-kicker { color: var(--accent); }
+html[data-theme="blueprint"] .doc-head h1,
+html[data-theme="blueprint"] .gate h1,
+html[data-theme="blueprint"] h2,
+html[data-theme="blueprint"] h3 {
+  font-family: "Consolas", "Courier New", monospace; color: var(--ink); border: 0;
+}
+html[data-theme="blueprint"] .lead,
+html[data-theme="blueprint"] .muted { color: var(--muted); opacity: 1; }
+html[data-theme="blueprint"] .card {
+  border: 1px solid var(--rule); border-radius: 0; background: var(--fill);
+}
+html[data-theme="blueprint"] .card h3 { color: var(--ink); border: 0; }
+html[data-theme="blueprint"] .card .sku { color: var(--accent); }
+html[data-theme="blueprint"] table.data {
+  border: 1px solid var(--rule); border-radius: 0; overflow: hidden; background: var(--paper);
+}
+html[data-theme="blueprint"] table.data th,
+html[data-theme="blueprint"] table.data td { border-bottom: 1px solid var(--rule); }
+html[data-theme="blueprint"] table.data th { background: var(--fill); color: var(--ink); font-family: "Consolas", "Courier New", monospace; }
+html[data-theme="blueprint"] table.data tr.group-row th {
+  background: var(--fill); color: var(--accent); border-bottom: 2px solid var(--accent);
+}
+html[data-theme="blueprint"] .btn {
+  background: var(--btn); color: var(--btn-ink); border: 1px solid var(--btn);
+  border-radius: 8px; font-family: "Consolas", "Courier New", monospace; font-weight: 700;
+}
+html[data-theme="blueprint"] .btn-ghost {
+  background: transparent; color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 8px; font-family: "Consolas", "Courier New", monospace; font-weight: 700;
+}
+html[data-theme="blueprint"] .note {
+  border-left: 4px solid var(--accent); background: var(--fill); border-radius: 0 8px 8px 0;
+}
+html[data-theme="blueprint"] .colophon {
+  border-top: 1px solid var(--rule); color: var(--muted); background: var(--fill);
+}
+html[data-theme="blueprint"] .prose a { color: var(--accent); }

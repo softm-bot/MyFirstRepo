@@ -1,0 +1,139 @@
+html[data-theme="kontur"] {
+  --bg: #0b0d0c;
+  --paper: #121512;
+  --ink: #d5d0c4;
+  --rule: #3d4a38;
+  --accent: #c9a24a;
+  --fill: #1a1f19;
+  --btn: #c9a24a;
+  --btn-ink: #14140e;
+}
+
+html[data-theme="kontur"] body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+html[data-theme="kontur"] .sheet { padding: 0; }
+html[data-theme="kontur"] .sheet-layout { max-width: none; padding: 0 12px; }
+html[data-theme="kontur"] .sheet-frame {
+  max-width: none;
+  border: 0;
+  background:
+    linear-gradient(var(--rule), var(--rule)) top left / 18px 1px no-repeat,
+    linear-gradient(var(--rule), var(--rule)) top left / 1px 18px no-repeat,
+    linear-gradient(var(--rule), var(--rule)) top right / 18px 1px no-repeat,
+    linear-gradient(var(--rule), var(--rule)) top right / 1px 18px no-repeat,
+    linear-gradient(var(--rule), var(--rule)) bottom left / 18px 1px no-repeat,
+    linear-gradient(var(--rule), var(--rule)) bottom left / 1px 18px no-repeat,
+    linear-gradient(var(--rule), var(--rule)) bottom right / 18px 1px no-repeat,
+    linear-gradient(var(--rule), var(--rule)) bottom right / 1px 18px no-repeat,
+    var(--paper);
+}
+html[data-theme="kontur"] .theme-rail {
+  padding-top: 22px;
+}
+
+html[data-theme="kontur"] .mast {
+  border-bottom: 1px solid var(--rule);
+  padding-top: 22px;
+}
+html[data-theme="kontur"] .mark-p {
+  border: 0;
+  color: var(--accent);
+  background: transparent;
+  padding: 0;
+}
+html[data-theme="kontur"] .mark-text strong {
+  font-family: var(--font-mono);
+  letter-spacing: 0.22em;
+  color: var(--accent);
+}
+html[data-theme="kontur"] .mark-text span { color: #9aa394; }
+html[data-theme="kontur"] .mast-meta { border-left: 2px solid var(--accent); padding-left: 10px; }
+html[data-theme="kontur"] .meta-row b { color: var(--accent); }
+
+html[data-theme="kontur"] .nav a {
+  border-bottom: 1px solid transparent;
+  color: #b7b3a8;
+}
+html[data-theme="kontur"] .nav a.is-active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+html[data-theme="kontur"] .nav-code { color: #6f7a68; }
+
+html[data-theme="kontur"] .theme-switch-label { color: #8b9284; }
+html[data-theme="kontur"] .theme-switch-btn {
+  border: 1px solid var(--rule);
+  color: #cfc8b8;
+  background: transparent;
+}
+html[data-theme="kontur"] .theme-switch-btn.is-active {
+  border-color: var(--accent);
+  color: var(--btn-ink);
+  background: var(--accent);
+}
+
+html[data-theme="kontur"] .doc-kicker { color: var(--accent); }
+html[data-theme="kontur"] h1,
+html[data-theme="kontur"] h2,
+html[data-theme="kontur"] h3 { font-family: var(--font-sans); letter-spacing: 0.01em; }
+html[data-theme="kontur"] h1 { border-bottom: 1px solid var(--rule); padding-bottom: 10px; }
+
+html[data-theme="kontur"] .card {
+  border: 1px solid var(--rule);
+  background: var(--fill);
+}
+html[data-theme="kontur"] .card h3 { color: var(--accent); border: 0; }
+
+html[data-theme="kontur"] table.data { border: 1px solid var(--rule); }
+html[data-theme="kontur"] table.data th,
+html[data-theme="kontur"] table.data td { border-bottom: 1px solid var(--rule); }
+html[data-theme="kontur"] table.data th {
+  background: #161b15;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+html[data-theme="kontur"] table.data tr.group-row th {
+  background: #1a1f19;
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent);
+}
+
+html[data-theme="kontur"] .btn {
+  background: var(--btn);
+  color: var(--btn-ink);
+  border: 1px solid var(--btn);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+html[data-theme="kontur"] .btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  font-family: var(--font-mono);
+}
+
+html[data-theme="kontur"] .note {
+  border-left: 2px solid var(--accent);
+  background: var(--fill);
+}
+html[data-theme="kontur"] .colophon {
+  border-top: 1px solid var(--rule);
+  color: #8b9284;
+}
+
+html[data-theme="kontur"] .sheet::before {
+  content: "ДСП · КОНТУР · ДОПУСК ПО УЧЁТНОЙ ЗАПИСИ";
+  display: block;
+  text-align: center;
+  font: 0.68rem/2 var(--font-mono);
+  letter-spacing: 0.16em;
+  color: var(--accent);
+  border-bottom: 1px solid var(--rule);
+  background: #0e110e;
+}
