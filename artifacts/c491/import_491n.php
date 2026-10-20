@@ -7,14 +7,6 @@ if (($_GET['k'] ?? '') !== $secret) {
     exit("forbidden\n");
 }
 
-$root = dirname(__DIR__); // gost-documents
-$configFile = $root . '/config.php';
-if (!is_file($configFile)) {
-    // public/ is cwd parent of this script in public/
-    $root = dirname(__DIR__);
-    $configFile = dirname(__DIR__) . '/config.php';
-}
-// This script lives in public/
 $appRoot = dirname(__DIR__);
 $configFile = $appRoot . '/config.php';
 if (!is_file($configFile)) {
@@ -26,73 +18,86 @@ $pdo = new PDO($config['db']['dsn'], $config['db']['user'], $config['db']['passw
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
 ]);
 
-$partsDir = __DIR__ . '/_c491_parts';
-$b64 = '';
-for ($i = 0; $i < 50; $i++) {
-    $f = sprintf('%s/part_%02d.txt', $partsDir, $i);
-    if (!is_file($f)) break;
-    $b64 .= file_get_contents($f);
-}
-if ($b64 === '') {
-    exit("no parts in $partsDir\n");
-}
-$pdf = $b64 !== '' ? base64_decode($b64, true) : false;
-
-// Fallback: local PDF next to this script or downloaded via ?pdf_url=
+// Prefer full local PDF (boot_491 downloads it). Ignore partial _c491_parts.
+$pdf = false;
 $localPdf = __DIR__ . '/Dogovor_491N_01.06.26_ECP.pdf';
-$c491Pdf = __DIR__ . '/_c491_parts/Dogovor_491N_01.06.26_ECP.pdf';
-if (($pdf === false || strlen($pdf) < 1000) && is_file($localPdf)) {
+if (is_file($localPdf)) {
     $pdf = file_get_contents($localPdf);
 }
-if (($pdf === false || strlen($pdf) < 1000) && is_file($c491Pdf)) {
-    $pdf = file_get_contents($c491Pdf);
-}
-if (($pdf === false || strlen($pdf) < 1000) && !empty($_GET['pdf_url'])) {
+if (($pdf === false || strlen((string)$pdf) < 100000) && !empty($_GET['pdf_url'])) {
     $url = (string)$_GET['pdf_url'];
-    if (preg_match('#^https://raw\.githubusercontent\.com/#', $url) || preg_match('#^https://gost\.info/#', $url)) {
+    if (preg_match('#^https://raw\.githubusercontent\.com/#', $url)) {
         $pdf = @file_get_contents($url);
     }
 }
-
-if ($pdf === false || strlen((string)$pdf) < 1000) {
-    exit("bad pdf decode len=" . strlen((string)$pdf) . "\n");
+if ($pdf === false || strlen((string)$pdf) < 100000) {
+    // last resort: re-download known artifact
+    $pdf = @file_get_contents('https://raw.githubusercontent.com/softm-bot/MyFirstRepo/cursor/document-registry-0959/artifacts/c491/Dogovor_491N_01.06.26_ECP.pdf');
+}
+if ($pdf === false || strlen((string)$pdf) < 100000) {
+    exit("bad pdf len=" . strlen((string)$pdf) . "\n");
 }
 echo "pdf_bytes=" . strlen($pdf) . "\n";
 
-// Org: НормаСофт INN 5259120833
+// Org: ООО «Нормасофт» INN 5259120833
 $org = $pdo->query("SELECT id, name, inn FROM organizations ORDER BY id")->fetchAll();
 echo "orgs=" . json_encode($org, JSON_UNESCAPED_UNICODE) . "\n";
 $orgId = null;
 foreach ($org as $o) {
-    $inn = preg_replace('/\D+/', '', (string)($o['inn'] ?? ''));
-    if ($inn === '5259120833' || stripos((string)$o['name'], 'НормаСофт') !== false || stripos((string)$o['name'], 'Норма софт') !== false) {
-        // Prefer exact INN match
-        if ($inn === '5259120833') { $orgId = (int)$o['id']; break; }
-        if ($orgId === null) $orgId = (int)$o['id'];
+    $oinn = preg_replace('/\D+/', '', (string)($o['inn'] ?? ''));
+    if ($oinn === '5259120833') {
+        $orgId = (int)$o['id'];
+        break;
     }
 }
-if ($orgId === null && $org) $orgId = (int)$org[0]['id'];
+if ($orgId === null && $org) {
+    $orgId = (int)$org[0]['id'];
+}
 echo "orgId=$orgId\n";
 
-// Recipient ВолгаСтальПроект INN 5260156231
+$cols = $pdo->query("SHOW COLUMNS FROM recipients")->fetchAll(PDO::FETCH_COLUMN);
+echo "recipient_cols=" . implode(',', $cols) . "\n";
+
 $inn = '5260156231';
 $recName = 'ООО «ВолгаСтальПроект»';
-$st = $pdo->prepare("SELECT id, name, inn FROM recipients WHERE organization_id = ? AND (REPLACE(REPLACE(inn,' ',''),'-','') = ? OR name LIKE ? OR card_inn = ?) LIMIT 5");
-$st->execute([$orgId, $inn, '%ВолгаСталь%', $inn]);
+
+$sql = "SELECT id, name FROM recipients WHERE name LIKE ?";
+$params = ['%ВолгаСталь%'];
+if (in_array('inn', $cols, true)) {
+    $sql .= " OR REPLACE(REPLACE(IFNULL(inn,''),' ',''),'-','') = ?";
+    $params[] = $inn;
+}
+if (in_array('card_inn', $cols, true)) {
+    $sql .= " OR REPLACE(REPLACE(IFNULL(card_inn,''),' ',''),'-','') = ?";
+    $params[] = $inn;
+}
+$sql .= " LIMIT 5";
+$st = $pdo->prepare($sql);
+$st->execute($params);
 $recs = $st->fetchAll();
 echo "recs_found=" . json_encode($recs, JSON_UNESCAPED_UNICODE) . "\n";
 $recipientId = $recs ? (int)$recs[0]['id'] : 0;
+
 if (!$recipientId) {
-    // detect columns
-    $cols = $pdo->query("SHOW COLUMNS FROM recipients")->fetchAll(PDO::FETCH_COLUMN);
-    $fields = ['organization_id' => $orgId, 'name' => $recName];
-    if (in_array('inn', $cols, true)) $fields['inn'] = $inn;
-    if (in_array('card_inn', $cols, true)) $fields['card_inn'] = $inn;
-    if (in_array('card_full', $cols, true)) $fields['card_full'] = $recName;
-    if (in_array('card_short', $cols, true)) $fields['card_short'] = 'ВолгаСтальПроект';
+    $fields = ['name' => $recName];
+    if (in_array('organization_id', $cols, true)) {
+        $fields['organization_id'] = $orgId;
+    }
+    if (in_array('inn', $cols, true)) {
+        $fields['inn'] = $inn;
+    }
+    if (in_array('card_inn', $cols, true)) {
+        $fields['card_inn'] = $inn;
+    }
+    if (in_array('card_full', $cols, true)) {
+        $fields['card_full'] = $recName;
+    }
+    if (in_array('card_short', $cols, true)) {
+        $fields['card_short'] = 'ВолгаСтальПроект';
+    }
     $keys = array_keys($fields);
-    $sql = 'INSERT INTO recipients (' . implode(',', $keys) . ') VALUES (' . implode(',', array_fill(0, count($keys), '?')) . ')';
-    $pdo->prepare($sql)->execute(array_values($fields));
+    $ins = 'INSERT INTO recipients (' . implode(',', $keys) . ') VALUES (' . implode(',', array_fill(0, count($keys), '?')) . ')';
+    $pdo->prepare($ins)->execute(array_values($fields));
     $recipientId = (int)$pdo->lastInsertId();
     echo "recipient_created=$recipientId\n";
 } else {
@@ -109,15 +114,17 @@ if ($existingId) {
     echo "already_exists id=$existingId\n";
     $docId = $existingId;
 } else {
-    // admin user
     $uid = (int)$pdo->query("SELECT id FROM users WHERE username='andrey' OR role='admin' ORDER BY id LIMIT 1")->fetchColumn();
-    // search code like НД-XXXX-XXXX
     $alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
     do {
         $code = 'НД-';
-        for ($i=0;$i<4;$i++) $code .= $alphabet[random_int(0, strlen($alphabet)-1)];
+        for ($i = 0; $i < 4; $i++) {
+            $code .= $alphabet[random_int(0, strlen($alphabet) - 1)];
+        }
         $code .= '-';
-        for ($i=0;$i<4;$i++) $code .= $alphabet[random_int(0, strlen($alphabet)-1)];
+        for ($i = 0; $i < 4; $i++) {
+            $code .= $alphabet[random_int(0, strlen($alphabet) - 1)];
+        }
         $chk = $pdo->prepare('SELECT id FROM documents WHERE search_code = ?');
         $chk->execute([$code]);
     } while ($chk->fetchColumn());
@@ -128,9 +135,10 @@ if ($existingId) {
     echo "document_created id=$docId code=$code\n";
 }
 
-// storage
 $storage = rtrim((string)$config['storage_path'], "/\\");
-if (!is_dir($storage)) mkdir($storage, 0700, true);
+if (!is_dir($storage)) {
+    mkdir($storage, 0700, true);
+}
 $stored = bin2hex(random_bytes(24)) . '.pdf';
 $path = $storage . DIRECTORY_SEPARATOR . $stored;
 if (file_put_contents($path, $pdf) === false) {
@@ -144,8 +152,10 @@ $fileRow = $pdo->prepare('SELECT id, stored_name, pdf_stored_name FROM document_
 $fileRow->execute([$docId]);
 $fr = $fileRow->fetch();
 if ($fr) {
-    foreach (['stored_name','pdf_stored_name'] as $k) {
-        if (!empty($fr[$k])) @unlink($storage . DIRECTORY_SEPARATOR . $fr[$k]);
+    foreach (['stored_name', 'pdf_stored_name'] as $k) {
+        if (!empty($fr[$k])) {
+            @unlink($storage . DIRECTORY_SEPARATOR . $fr[$k]);
+        }
     }
     $pdo->prepare('UPDATE document_files SET original_name=?, stored_name=?, mime_type=?, file_size=?, pdf_stored_name=?, pdf_original_name=?, pdf_file_size=?, file_uploaded_at=NOW() WHERE id=?')
         ->execute([$orig, $stored, $mime, $size, $stored, $orig, $size, (int)$fr['id']]);
@@ -156,7 +166,6 @@ if ($fr) {
     echo "file_inserted\n";
 }
 
-// contract_details
 $pdo->exec("CREATE TABLE IF NOT EXISTS contract_details (
   document_id BIGINT UNSIGNED PRIMARY KEY,
   status VARCHAR(32) NOT NULL DEFAULT 'approval',
@@ -193,7 +202,10 @@ $pdo->prepare('INSERT INTO contract_details (document_id, status, amount, produc
 ]);
 echo "contract_details_ok\n";
 
-// cleanup parts + self optionally
-foreach (glob($partsDir . '/part_*.txt') ?: [] as $f) @unlink($f);
-@rmdir($partsDir);
-echo "DONE doc_id=$docId num=$num org=$orgId recipient=$recipientId stored=$stored\n";
+// cleanup helper files
+@unlink(__DIR__ . '/boot_491.php');
+foreach (glob(__DIR__ . '/_c491_parts/part_*.txt') ?: [] as $f) {
+    @unlink($f);
+}
+@rmdir(__DIR__ . '/_c491_parts');
+echo "DONE doc_id=$docId num=$num org=$orgId recipient=$recipientId stored=$stored size=$size\n";
