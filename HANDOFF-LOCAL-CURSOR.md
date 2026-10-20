@@ -46,7 +46,21 @@ https://gost.info/gost-documents/?journal=contract&q=&filter_status=&filter_reci
 
 `u1534553_cursor` **попадает** в живой `public/` (проверено 2026-10-20). LIST/RETR часто таймаутятся; надёжнее мелкие STOR с ретраями или заливка через FileZilla.
 
-**Статус v1.6.2:** на сайте сейчас **v1.6.1** (`APP_VERSION`). Папки `_v162` и файла `CURSOR_TASK_v162_journal_filters.md` на FTP **нет**. Для выкладки нужен локальный `public/index.php` (и связанные файлы) с диска `C:\Users\andre\Desktop\кп\gost-documents` — пришлите архивом/вложением в чат.
+**Статус v1.6.2:** на сайте сейчас **v1.6.1** (`APP_VERSION`).
+
+Локально (диск Андрея, **не** GitHub cloud workspace):
+
+`C:\Users\andre\Desktop\кп\gost-documents\`
+- `CURSOR_TASK_v162_journal_filters.md` (+ копия в `_v162\`)
+- `_v162\index.after_v162.php` → готовый `public/index.php` v1.6.2
+- `_v162\index.before_v162.php` → эталон v1.6.1 до правки
+- `_v162\patch_v162.py` → если живой файл ≠ before
+
+Алгоритм выкладки: скачать живой `public/index.php` → сравнить с `index.before_v162.php` → если равны, залить `index.after_v162.php`; иначе прогнать `patch_v162.py` по живому файлу и залить результат. Локальный `public/index.php` в этой папке **не трогать** (старый от 01.10).
+
+Cloud Agent **не видит** `C:\Users\...` — нужны вложения этих файлов в чат, либо выкладка из **локального** Cursor с открытой этой папкой.
+
+Пароль `u1534553_cursor` светился в чате — сменить в панели REG.RU; новый пароль только в локальный `cursor.txt`, не в чат.
 
 ### MySQL
 | | |
