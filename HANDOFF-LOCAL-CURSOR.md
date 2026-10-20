@@ -39,11 +39,14 @@ https://gost.info/gost-documents/?journal=contract&q=&filter_status=&filter_reci
 |--|--|
 | Хост | `37.140.192.169:21` |
 | Сайт (FileZilla) | `u1534553_andrey` — пароль у владельца |
-| Агент | `u1534553_cursor` / `eM0gI3uU4iyA8aY7` |
+| Агент | `u1534553_cursor` / `yQ4wY6mL9xsS3fM1` |
+| gost.info (из `D:\cursor\cursor.txt`) | `u1534553_curs_4_gost_info` / `zW1jN8rQ8jiT0uD5` |
 | Корень сайта на диске | `/var/www/u1534553/data/www/gost.info/gost-documents/` |
 | FTP-путь | `www/gost.info/gost-documents/` (`public/`, `src/`, `bin/`, `storage/`, `config.php`) |
 
-`u1534553_cursor` **попадает** в живой `public/` (проверено). LIST/RETR часто таймаутятся; надёжнее мелкие STOR с ретраями или заливка через FileZilla от andrey.
+`u1534553_cursor` **попадает** в живой `public/` (проверено 2026-10-20). LIST/RETR часто таймаутятся; надёжнее мелкие STOR с ретраями или заливка через FileZilla.
+
+**Статус v1.6.2:** на сайте сейчас **v1.6.1** (`APP_VERSION`). Папки `_v162` и файла `CURSOR_TASK_v162_journal_filters.md` на FTP **нет**. Для выкладки нужен локальный `public/index.php` (и связанные файлы) с диска `C:\Users\andre\Desktop\кп\gost-documents` — пришлите архивом/вложением в чат.
 
 ### MySQL
 | | |
